@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class TestController {
 //    @Autowired
@@ -42,14 +43,17 @@ public class TestController {
 
     @Autowired
     AuthenticationManager authenticationManager;
+
     @GetMapping("/user")
         public ResponseEntity<List<User>> AllUser(){
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken("bence", "pass"));
-
         List<User> users = userRepo.findAll();
             return new ResponseEntity<>(users,HttpStatus.OK);
         }
+
+    @GetMapping("/usersCount")
+    public ResponseEntity<Long> CountUsers(){
+        Long count = userRepo.count();
+        return new ResponseEntity<>(count,HttpStatus.OK);
+    }
     }
 
