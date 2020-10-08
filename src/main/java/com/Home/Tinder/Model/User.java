@@ -1,11 +1,22 @@
 package com.Home.Tinder.Model;
 
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
+import org.springframework.util.ResourceUtils;
 
+import javax.imageio.ImageIO;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class User {
     @Id
@@ -26,10 +37,13 @@ public class User {
 
     private List<String> photos;
 
+    private List<String> nextUsersQueue;
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.photos = new ArrayList<>();
+        this.nextUsersQueue = new ArrayList<>();
     }
 
     public int getLikes(){
@@ -58,8 +72,12 @@ public class User {
         return password;
     }
 
-    public List<String> getPhotos() {
+    public List<String> getPhotos(){
         return photos;
+    }
+
+    public List<String> getNextUsersQueue(){
+        return nextUsersQueue;
     }
 
     public void addPhoto(String photoId) {

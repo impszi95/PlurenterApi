@@ -1,17 +1,17 @@
 package com.Home.Tinder.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.core.userdetails.UserDetails;
 
 
@@ -31,7 +31,9 @@ public class UserDetailsImpl implements UserDetails {
 
     private List<String> photos;
 
-    public UserDetailsImpl(String id, String username, int likes, String password
+    private Queue<String> nextUsersQueue;
+
+    public UserDetailsImpl(String id, String username, int likes, String password,List<String> photos, List<String> nextUsersQueue
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -39,6 +41,9 @@ public class UserDetailsImpl implements UserDetails {
         this.password = password;
 //        this.authorities = authorities;
         this.likes = likes;
+        this.photos = photos;
+        this.nextUsersQueue = new LinkedBlockingQueue<>(nextUsersQueue);
+
     }
 
     public static UserDetailsImpl build(User user) {
@@ -50,7 +55,9 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getUsername(),
                 user.getLikes(),
-                user.getPassword()
+                user.getPassword(),
+                user.getPhotos(),
+                user.getNextUsersQueue()
 //                authorities
                 );
     }
@@ -62,7 +69,18 @@ public class UserDetailsImpl implements UserDetails {
         return likes;
     }
 
-    public List<String> getPhotos() {return photos;}
+
+    public Queue<String> getNextUsersQueue(){
+        return nextUsersQueue;
+    }
+
+    public void setNextUsersQueue(Queue<String> queue){
+        nextUsersQueue = queue;
+    }
+
+    public List<String> getPhotos(){
+        return photos;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
