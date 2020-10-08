@@ -1,5 +1,6 @@
 package com.Home.Tinder.Service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +29,8 @@ public class UserDetailsImpl implements UserDetails {
 
     private int likes;
 
+    private List<String> photos;
+
     public UserDetailsImpl(String id, String username, int likes, String password
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
@@ -54,10 +57,12 @@ public class UserDetailsImpl implements UserDetails {
     public String getId() {
         return id;
     }
-  public int getLikes() {
+
+    public int getLikes() {
         return likes;
     }
 
+    public List<String> getPhotos() {return photos;}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

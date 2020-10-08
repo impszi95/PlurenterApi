@@ -1,14 +1,11 @@
 package com.Home.Tinder.Model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     @Id
@@ -27,9 +24,12 @@ public class User {
 
     private int likes;
 
+    private List<String> photos;
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.photos = new ArrayList<>();
     }
 
     public int getLikes(){
@@ -58,8 +58,12 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public List<String> getPhotos() {
+        return photos;
+    }
+
+    public void addPhoto(String photoId) {
+        this.photos.add(photoId);
     }
 
 //    public Set<Role> getRoles() {
