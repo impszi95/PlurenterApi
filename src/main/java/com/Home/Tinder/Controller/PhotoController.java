@@ -29,7 +29,7 @@ public class PhotoController {
 
 
     @PostMapping(value = "/photos/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addPhoto(@RequestParam("userId") String userId, @RequestParam("file") MultipartFile image) throws IOException {
+    public ResponseEntity<?> addPhoto(@RequestParam("userId") String userId, @RequestParam("file") MultipartFile image) throws Exception {
 
         String id = photoService.addPhoto(image,userId);
 

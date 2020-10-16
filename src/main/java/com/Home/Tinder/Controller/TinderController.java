@@ -1,18 +1,15 @@
 package com.Home.Tinder.Controller;
 
-import com.Home.Tinder.Model.Photo;
-import com.Home.Tinder.Security.Payload.Response.TinderNextUserResponse;
+import com.Home.Tinder.Security.Payload.Response.NextMeetResponse;
 import com.Home.Tinder.Service.TinderService;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -21,12 +18,12 @@ public class TinderController {
     @Autowired
     TinderService tinderService;
 
-    @GetMapping("/nextUser")
+    @GetMapping("/nextMeet")
     public ResponseEntity<?> getAllPhotos(){
 
-        TinderNextUserResponse nextUsersResponse = tinderService.getNextUser();
+        NextMeetResponse nextMeetResponse = tinderService.getNextUser();
 
-        return ResponseEntity.ok(nextUsersResponse);
+        return ResponseEntity.ok(nextMeetResponse);
     }
 
     @PostMapping(value = "/likeUser")
@@ -35,6 +32,6 @@ public class TinderController {
 
         tinderService.XUserLikesYUser(userDetails.getId(), userId);
 
-        return new ResponseEntity<String>("Liked", HttpStatus.OK);
+        return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.Home.Tinder.Controller;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ import com.Home.Tinder.Security.Payload.Response.MessageResponse;
 import com.Home.Tinder.Security.jwt.JwtUtils;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +27,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -125,6 +128,11 @@ public class AuthController {
 //
 //        user.setRoles(roles);
         userRepo.save(user);
+
+        //Put his id to meets hasset
+        User _user = userRepo.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username not exists"));
+        _user.addPreviousMeets(user.getId());
+        userRepo.save(_user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

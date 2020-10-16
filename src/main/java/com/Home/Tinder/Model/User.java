@@ -12,9 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -30,21 +28,24 @@ public class User {
     @Size(max = 120)
     private String password;
 
+
+
 //    @DBRef
 //    private Set<Role> roles;
+
+    private HashSet<String> previousMeets;
 
     private int likes;
 
     private List<Photo> photos;
 
-    private List<String> nextUsersQueue;
-
     public User(String username, String password) {
         this.username = username;
         this.password = password;
         this.photos = new ArrayList<>();
-        this.nextUsersQueue = new ArrayList<>();
+        this.previousMeets = new HashSet<>();
     }
+
 
     public int getLikes(){
         return likes;
@@ -76,12 +77,16 @@ public class User {
         return photos;
     }
 
-    public List<String> getNextUsersQueue(){
-        return nextUsersQueue;
-    }
-
     public void addPhoto(Photo photo) {
         this.photos.add(photo);
+    }
+
+    public HashSet<String> getPreviousMeets() {
+        return previousMeets;
+    }
+
+    public void addPreviousMeets(String userId) {
+        this.previousMeets.add(userId);
     }
 
 //    public Set<Role> getRoles() {

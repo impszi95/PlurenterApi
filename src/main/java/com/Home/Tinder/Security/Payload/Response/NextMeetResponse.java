@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TinderNextUserResponse {
+public class NextMeetResponse {
         private String username;
-        private String photo;
+        private Photo photo;
 }

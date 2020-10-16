@@ -1,25 +1,14 @@
 package com.Home.Tinder.Service;
 
-import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
-import com.Home.Tinder.Security.Payload.Response.TinderNextUserResponse;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import io.jsonwebtoken.lang.Assert;
-import org.bson.Document;
+import com.Home.Tinder.Security.Payload.Response.NextMeetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
-import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
 public class TinderService {
@@ -27,48 +16,35 @@ public class TinderService {
     @Autowired
     UserRepo userRepo;
 
-    public TinderNextUserResponse getNextUser() {
+    public NextMeetResponse getNextUser() {
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
         //kül peek()et-->TindernextResp-t visszaadom, aztán remove first-ölöm
-
+        Random rand = new Random();
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        int n = 5; //queue size
-        if (userDetails.getNextUsersQueue().size() < n){
-            userDetails.setNextUsersQueue(getNDifferentUserIds(n));
+        int repo_size = userRepo.findAll().size();
+
+        //Met with all already
+        if (repo_size == userDetails.getGetPreviousMeets().size())
+        {
+            return new NextMeetResponse("",null);
         }
 
-        String nextUserID = userDetails.getNextUsersQueue().peek();
-        userDetails.getNextUsersQueue().remove();
-        List<Photo> photos = userDetails.getPhotos();
-        String photo = "";
-        if (photos.size() != 0) {
-            photo = userDetails.getPhotos().get(0).getId();
-        }
-        return new TinderNextUserResponse(nextUserID, photo);
-    }
+        String rndUserId = "";
+        do {
+            rndUserId = userRepo.findAll().get(rand.nextInt(repo_size)).getId();
 
-    private Queue<String> getNDifferentUserIds(int n){
-       Queue<String> userIds = new LinkedBlockingQueue<>();
+        }while (userDetails.getGetPreviousMeets().contains(rndUserId));
 
-       int size = userRepo.findAll().size();
-       Random rand = new Random();
-       int counter = 0;
+        User nextMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
 
-       while (counter<n){
-           String rndUserId = userRepo.findAll().get(rand.nextInt(size)).getId();
-           if (!userIds.contains(rndUserId)){
-               userIds.add(rndUserId);
-               counter++;
-           }
-       }
-       return userIds;
+        return new NextMeetResponse(nextMeet.getUsername(), nextMeet.getPhotos().get(0));
     }
 
     public void XUserLikesYUser(String idX, String idY){
-//        User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
-        //X user like listájába bele Y user id-je
-//        userRepo.save(userX);1
+        User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
+        userX.addPreviousMeets(idY);
+        userRepo.save(userX);
 
         User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
         int prev_likes = userY.getLikes();

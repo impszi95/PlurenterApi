@@ -31,9 +31,9 @@ public class UserDetailsImpl implements UserDetails {
 
     private List<Photo> photos;
 
-    private Queue<String> nextUsersQueue;
+    private HashSet<String> getPreviousMeets;
 
-    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, List<String> nextUsersQueue
+    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, HashSet<String> getPreviousMeets
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -42,8 +42,7 @@ public class UserDetailsImpl implements UserDetails {
 //        this.authorities = authorities;
         this.likes = likes;
         this.photos = photos;
-        this.nextUsersQueue = new LinkedBlockingQueue<>(nextUsersQueue);
-
+        this.getPreviousMeets = getPreviousMeets;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -57,7 +56,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLikes(),
                 user.getPassword(),
                 user.getPhotos(),
-                user.getNextUsersQueue()
+                user.getPreviousMeets()
 //                authorities
                 );
     }
@@ -69,13 +68,6 @@ public class UserDetailsImpl implements UserDetails {
         return likes;
     }
 
-    public Queue<String> getNextUsersQueue(){
-        return nextUsersQueue;
-    }
-
-    public void setNextUsersQueue(Queue<String> queue){
-        nextUsersQueue = queue;
-    }
 
     public List<Photo> getPhotos(){
         return photos;
@@ -124,5 +116,14 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
+    }
+
+
+    public HashSet<String> getGetPreviousMeets() {
+        return getPreviousMeets;
+    }
+
+    public void setGetPreviousMeets(HashSet<String> getPreviousMeets) {
+        this.getPreviousMeets = getPreviousMeets;
     }
 }
