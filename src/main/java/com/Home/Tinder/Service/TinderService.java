@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Array;
@@ -39,10 +40,10 @@ public class TinderService {
 
         String nextUserID = userDetails.getNextUsersQueue().peek();
         userDetails.getNextUsersQueue().remove();
-        List<String> photos = userDetails.getPhotos();
+        List<Photo> photos = userDetails.getPhotos();
         String photo = "";
         if (photos.size() != 0) {
-            photo = userDetails.getPhotos().get(0);
+            photo = userDetails.getPhotos().get(0).getId();
         }
         return new TinderNextUserResponse(nextUserID, photo);
     }
@@ -62,5 +63,16 @@ public class TinderService {
            }
        }
        return userIds;
+    }
+
+    public void XUserLikesYUser(String idX, String idY){
+//        User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
+        //X user like listájába bele Y user id-je
+//        userRepo.save(userX);1
+
+        User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
+        int prev_likes = userY.getLikes();
+        userY.setLikes(prev_likes+1);
+        userRepo.save(userY);
     }
 }

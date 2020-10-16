@@ -5,12 +5,13 @@ import com.Home.Tinder.Security.Payload.Response.TinderNextUserResponse;
 import com.Home.Tinder.Service.TinderService;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "*")
@@ -26,5 +27,14 @@ public class TinderController {
         TinderNextUserResponse nextUsersResponse = tinderService.getNextUser();
 
         return ResponseEntity.ok(nextUsersResponse);
+    }
+
+    @PostMapping(value = "/likeUser")
+    public ResponseEntity<String> LikeUser(@RequestParam("userId") String userId) throws IOException {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        tinderService.XUserLikesYUser(userDetails.getId(), userId);
+
+        return new ResponseEntity<String>("Liked", HttpStatus.OK);
     }
 }

@@ -35,7 +35,7 @@ public class PhotoService {
         //Link photo to its user also
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
-        user.addPhoto(photo.getId());
+        user.addPhoto(photo);
         userRepo.save(user);
 
         return photo.getId();

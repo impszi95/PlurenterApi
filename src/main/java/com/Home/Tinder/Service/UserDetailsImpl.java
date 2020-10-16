@@ -29,11 +29,11 @@ public class UserDetailsImpl implements UserDetails {
 
     private int likes;
 
-    private List<String> photos;
+    private List<Photo> photos;
 
     private Queue<String> nextUsersQueue;
 
-    public UserDetailsImpl(String id, String username, int likes, String password,List<String> photos, List<String> nextUsersQueue
+    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, List<String> nextUsersQueue
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -69,7 +69,6 @@ public class UserDetailsImpl implements UserDetails {
         return likes;
     }
 
-
     public Queue<String> getNextUsersQueue(){
         return nextUsersQueue;
     }
@@ -78,7 +77,7 @@ public class UserDetailsImpl implements UserDetails {
         nextUsersQueue = queue;
     }
 
-    public List<String> getPhotos(){
+    public List<Photo> getPhotos(){
         return photos;
     }
 

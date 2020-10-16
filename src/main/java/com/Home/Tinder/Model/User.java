@@ -35,7 +35,7 @@ public class User {
 
     private int likes;
 
-    private List<String> photos;
+    private List<Photo> photos;
 
     private List<String> nextUsersQueue;
 
@@ -72,7 +72,7 @@ public class User {
         return password;
     }
 
-    public List<String> getPhotos(){
+    public List<Photo> getPhotos(){
         return photos;
     }
 
@@ -80,8 +80,8 @@ public class User {
         return nextUsersQueue;
     }
 
-    public void addPhoto(String photoId) {
-        this.photos.add(photoId);
+    public void addPhoto(Photo photo) {
+        this.photos.add(photo);
     }
 
 //    public Set<Role> getRoles() {
