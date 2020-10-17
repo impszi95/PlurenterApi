@@ -1,6 +1,6 @@
 package com.Home.Tinder.Controller;
 
-import com.Home.Tinder.Security.Payload.Response.NextMeetResponse;
+import com.Home.Tinder.Security.Payload.Response.ActualMeetResponse;
 import com.Home.Tinder.Service.TinderService;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,10 @@ public class TinderController {
     @Autowired
     TinderService tinderService;
 
-    @GetMapping("/nextMeet")
+    @GetMapping("/actualMeet")
     public ResponseEntity<?> getAllPhotos(){
-
-        NextMeetResponse nextMeetResponse = tinderService.getNextUser();
-
-        return ResponseEntity.ok(nextMeetResponse);
+        ActualMeetResponse actualMeetResponse = tinderService.GetActualMeet();
+        return ResponseEntity.ok(actualMeetResponse);
     }
 
     @PostMapping(value = "/likeUser")

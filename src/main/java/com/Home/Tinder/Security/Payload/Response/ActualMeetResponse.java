@@ -4,9 +4,12 @@ import com.Home.Tinder.Model.Photo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
-public class NextMeetResponse {
+public class ActualMeetResponse {
+        private String id;
         private String username;
-        private Photo photo;
+        private List<Photo> photos;
 }

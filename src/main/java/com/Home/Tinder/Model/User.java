@@ -35,6 +35,8 @@ public class User {
 
     private HashSet<String> previousMeets;
 
+    private String actualMeetId;
+
     private int likes;
 
     private List<Photo> photos;
@@ -42,6 +44,8 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.likes = 0;
+        this.actualMeetId = "";
         this.photos = new ArrayList<>();
         this.previousMeets = new HashSet<>();
     }
@@ -87,6 +91,14 @@ public class User {
 
     public void addPreviousMeets(String userId) {
         this.previousMeets.add(userId);
+    }
+
+    public String getActualMeetId() {
+        return actualMeetId;
+    }
+
+    public void setActualMeetId(String actualMeetId) {
+        this.actualMeetId = actualMeetId;
     }
 
 //    public Set<Role> getRoles() {

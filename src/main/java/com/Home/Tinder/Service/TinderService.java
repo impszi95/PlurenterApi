@@ -2,7 +2,7 @@ package com.Home.Tinder.Service;
 
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
-import com.Home.Tinder.Security.Payload.Response.NextMeetResponse;
+import com.Home.Tinder.Security.Payload.Response.ActualMeetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,29 +16,49 @@ public class TinderService {
     @Autowired
     UserRepo userRepo;
 
-    public NextMeetResponse getNextUser() {
+    private void setNextUser(String userId) {
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
         //kül peek()et-->TindernextResp-t visszaadom, aztán remove first-ölöm
         Random rand = new Random();
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = userRepo.findById(userId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
 
         int repo_size = userRepo.findAll().size();
-
-        //Met with all already
-        if (repo_size == userDetails.getGetPreviousMeets().size())
+        if (repo_size == user.getPreviousMeets().size())
         {
-            return new NextMeetResponse("",null);
+            return;
         }
-
         String rndUserId = "";
         do {
             rndUserId = userRepo.findAll().get(rand.nextInt(repo_size)).getId();
 
-        }while (userDetails.getGetPreviousMeets().contains(rndUserId));
+        }while (user.getPreviousMeets().contains(rndUserId));
 
         User nextMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
 
-        return new NextMeetResponse(nextMeet.getUsername(), nextMeet.getPhotos().get(0));
+        user.setActualMeetId(nextMeet.getId());
+        userRepo.save(user);
+    }
+
+    public ActualMeetResponse GetActualMeet(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String actualMeetId = userDetails.getActualMeetId();
+
+        //First login
+        if(userDetails.getActualMeetId().equals("")){
+            setNextUser(userDetails.getId());
+            User actualUser = userRepo.findById(userDetails.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId"));
+            actualMeetId = actualUser.getActualMeetId();
+        }
+
+        //Met with all already
+        int repo_size = userRepo.findAll().size();
+        if (repo_size == userDetails.getGetPreviousMeets().size())
+        {
+            return new ActualMeetResponse("","",null);
+        }
+
+        User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
+        return new ActualMeetResponse(actualMeet.getId(), actualMeet.getUsername(), actualMeet.getPhotos());
     }
 
     public void XUserLikesYUser(String idX, String idY){
@@ -50,5 +70,7 @@ public class TinderService {
         int prev_likes = userY.getLikes();
         userY.setLikes(prev_likes+1);
         userRepo.save(userY);
+
+        setNextUser(idX);
     }
 }

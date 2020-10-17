@@ -29,11 +29,13 @@ public class UserDetailsImpl implements UserDetails {
 
     private int likes;
 
+    private String actualMeetId;
+
     private List<Photo> photos;
 
     private HashSet<String> getPreviousMeets;
 
-    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, HashSet<String> getPreviousMeets
+    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, String actualMeetId, HashSet<String> getPreviousMeets
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -42,6 +44,7 @@ public class UserDetailsImpl implements UserDetails {
 //        this.authorities = authorities;
         this.likes = likes;
         this.photos = photos;
+        this.actualMeetId = actualMeetId;
         this.getPreviousMeets = getPreviousMeets;
     }
 
@@ -56,6 +59,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLikes(),
                 user.getPassword(),
                 user.getPhotos(),
+                user.getActualMeetId(),
                 user.getPreviousMeets()
 //                authorities
                 );
@@ -123,7 +127,6 @@ public class UserDetailsImpl implements UserDetails {
         return getPreviousMeets;
     }
 
-    public void setGetPreviousMeets(HashSet<String> getPreviousMeets) {
-        this.getPreviousMeets = getPreviousMeets;
-    }
+    public String getActualMeetId(){return  this.actualMeetId;}
+
 }
