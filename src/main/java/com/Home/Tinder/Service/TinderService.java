@@ -1,5 +1,6 @@
 package com.Home.Tinder.Service;
 
+import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
 import com.Home.Tinder.Security.Payload.Response.ActualMeetResponse;
@@ -54,7 +55,7 @@ public class TinderService {
         int repo_size = userRepo.findAll().size();
         if (repo_size == userDetails.getGetPreviousMeets().size())
         {
-            return new ActualMeetResponse("","",null);
+            return new ActualMeetResponse("", "", new ArrayList<Photo>());
         }
 
         User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
