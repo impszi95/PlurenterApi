@@ -1,20 +1,10 @@
 package com.Home.Tinder.Model;
 
-import org.bson.BsonBinarySubType;
-import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
-import org.springframework.util.ResourceUtils;
 
-import javax.imageio.ImageIO;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class User {
     @Id
@@ -35,6 +25,12 @@ public class User {
 
     private HashSet<String> previousMeets;
 
+    private HashSet<String> matchedMeets;
+
+    private HashSet<String> likedMeets;
+
+    private HashSet<String> receivedLikesMeets;
+
     private String actualMeetId;
 
     private int likes;
@@ -48,6 +44,9 @@ public class User {
         this.actualMeetId = "";
         this.photos = new ArrayList<>();
         this.previousMeets = new HashSet<>();
+        this.matchedMeets = new HashSet<>();
+        this.likedMeets = new HashSet<>();
+        this.receivedLikesMeets = new HashSet<>();
     }
 
 
@@ -99,6 +98,38 @@ public class User {
 
     public void setActualMeetId(String actualMeetId) {
         this.actualMeetId = actualMeetId;
+    }
+
+    public HashSet<String> getMatchedMeets() {
+        return matchedMeets;
+    }
+
+    public void addMatchedMeet(String matchedMeets) {
+        this.matchedMeets.add(matchedMeets);
+    }
+
+    public HashSet<String> getLikedMeets() {
+        return likedMeets;
+    }
+
+    public void removeLikedMeet(String meet){
+        this.likedMeets.remove(meet);
+    }
+
+    public void addLikedMeet(String likedMeet) {
+        this.likedMeets.add(likedMeet);
+    }
+
+    public HashSet<String> getReceivedLikesMeets() {
+        return receivedLikesMeets;
+    }
+
+    public void addReceivedLikesMeets(String receivedLikesMeet) {
+        this.receivedLikesMeets.add(receivedLikesMeet);
+    }
+
+    public void removeReceivedMeet(String meet){
+        this.receivedLikesMeets.remove(meet);
     }
 
 //    public Set<Role> getRoles() {

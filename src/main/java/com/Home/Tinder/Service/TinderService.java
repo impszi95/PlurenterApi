@@ -3,7 +3,7 @@ package com.Home.Tinder.Service;
 import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
-import com.Home.Tinder.Security.Payload.Response.ActualMeetResponse;
+import com.Home.Tinder.Security.Payload.Response.MeetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +17,7 @@ public class TinderService {
     @Autowired
     UserRepo userRepo;
 
-    private void setNextUser(String userId) {
+    private void SetNextUser(String userId) {
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
         //kül peek()et-->TindernextResp-t visszaadom, aztán remove first-ölöm
         Random rand = new Random();
@@ -40,13 +40,13 @@ public class TinderService {
         userRepo.save(user);
     }
 
-    public ActualMeetResponse GetActualMeet(){
+    public MeetResponse GetActualMeet(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String actualMeetId = userDetails.getActualMeetId();
 
         //First login
         if(userDetails.getActualMeetId().equals("")){
-            setNextUser(userDetails.getId());
+            SetNextUser(userDetails.getId());
             User actualUser = userRepo.findById(userDetails.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId"));
             actualMeetId = actualUser.getActualMeetId();
         }
@@ -55,23 +55,64 @@ public class TinderService {
         int repo_size = userRepo.findAll().size();
         if (repo_size == userDetails.getGetPreviousMeets().size())
         {
-            return new ActualMeetResponse("", "", new ArrayList<Photo>());
+            return new MeetResponse("", "", new ArrayList<Photo>());
         }
 
         User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: RandomID"));
-        return new ActualMeetResponse(actualMeet.getId(), actualMeet.getUsername(), actualMeet.getPhotos());
+        return new MeetResponse(actualMeet.getId(), actualMeet.getUsername(), actualMeet.getPhotos());
     }
 
-    public void XUserLikesYUser(String idX, String idY){
+    public void XMetY(String idX, String idY){
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
         userX.addPreviousMeets(idY);
         userRepo.save(userX);
 
+        SetNextUser(idX);
+    }
+
+    public void XUserLikesYUser(String idX, String idY){
+        XMetY(idX,idY);
+        SaveLike(idX, idY);
+        IncementLikes(idY);
+    }
+
+    private void SaveLike(String idX, String idY) {
+        User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
+        User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
+
+        boolean matched = userX.getReceivedLikesMeets().contains(idY);
+        if (matched){
+            userX.addMatchedMeet(idY);
+            userY.addMatchedMeet(idX);
+
+            userX.removeReceivedMeet(idY);
+            userY.removeLikedMeet(idX);
+        }
+        else {
+            userX.addLikedMeet(idY);
+            userY.addReceivedLikesMeets(idX);
+        }
+        userRepo.save(userX);
+        userRepo.save(userY);
+    }
+
+    public void IncementLikes(String idY){
         User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
         int prev_likes = userY.getLikes();
         userY.setLikes(prev_likes+1);
         userRepo.save(userY);
-
-        setNextUser(idX);
     }
+
+    public List<MeetResponse> GetAllMatchedMeets(String idX){
+        List<MeetResponse> matchedMeetsRes = new ArrayList<>();
+        User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
+
+        for (String matchedMeetId : userX.getMatchedMeets()){
+            User matchedMeet = userRepo.findById(matchedMeetId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
+            MeetResponse matchedMeetRes = new MeetResponse(matchedMeet.getId(), matchedMeet.getUsername(), matchedMeet.getPhotos());
+            matchedMeetsRes.add(matchedMeetRes);
+        }
+        return matchedMeetsRes;
+    }
+
 }

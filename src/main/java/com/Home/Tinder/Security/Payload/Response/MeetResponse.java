@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ActualMeetResponse {
+public class MeetResponse {
         private String id;
         private String username;
         private List<Photo> photos;
