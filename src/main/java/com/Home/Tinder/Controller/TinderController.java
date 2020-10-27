@@ -24,7 +24,8 @@ public class TinderController {
 
     @GetMapping("/actualMeet")
     public ResponseEntity<?> actualMeet(){
-        MeetResponse meetResponse = tinderService.GetActualMeet();
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        MeetResponse meetResponse = tinderService.GetActualMeet(userDetails.getId());
         return ResponseEntity.ok(meetResponse);
     }
 
