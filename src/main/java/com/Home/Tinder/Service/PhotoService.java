@@ -2,7 +2,6 @@ package com.Home.Tinder.Service;
 
 import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
-import com.Home.Tinder.Repo.PhotoRepository;
 import com.Home.Tinder.Repo.UserRepo;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
@@ -26,9 +25,6 @@ import java.util.Optional;
 public class PhotoService {
 
     @Autowired
-    private PhotoRepository photoRepo;
-
-    @Autowired
     private UserRepo userRepo;
 
     public String addPhoto(MultipartFile file, String userId) throws Exception {
@@ -41,7 +37,6 @@ public class PhotoService {
 
         photo.setImage(
                 new Binary(BsonBinarySubType.BINARY, resizedByte));
-        photo = photoRepo.insert(photo);
 
         //Link photo to its user also
         User user = userRepo.findById(userId)
@@ -51,18 +46,9 @@ public class PhotoService {
 
         return photo.getId();
     }
-
-    public Photo getPhoto(String userId) {
-        return photoRepo.findById(userId).get();
-    }
-
-    public List<Photo> finAllByUserId(String userId){
-        return photoRepo.findByUserId(userId);
-    }
-
     BufferedImage ResizeImage(BufferedImage originalImage) throws Exception {
         Dimension imgSize = new Dimension(originalImage.getWidth(), originalImage.getHeight());
-        Dimension boundary = new Dimension(300, 300);
+        Dimension boundary = new Dimension(600, 600);
         Dimension targetDimension = getScaledDimension(imgSize,boundary);
 
         return Scalr.resize(originalImage, Scalr.Method.QUALITY, targetDimension.width,targetDimension.height);

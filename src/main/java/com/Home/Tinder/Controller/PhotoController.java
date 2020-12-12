@@ -36,24 +36,11 @@ public class PhotoController {
         return ResponseEntity.ok(id);
     }
 
-    //Működik jól, visszaadja a base64es dekódolt képet a db-ből, de baromi lassu és nagy méretű a kódolás.
-    //Inkább url megoldást használok
-
-//   @GetMapping("/photos/{id}")
-//   public ResponseEntity<?> getPhoto(@PathVariable String userId, Model model) {
-//       Photo photo = photoService.getPhoto(userId);
-//       model.addAttribute("image",
-//               Base64.getEncoder().encodeToString(photo.getImage().getData()));
-//       return ResponseEntity.ok(model);
-//   }
-
     @GetMapping("/photos")
     public ResponseEntity<?> getAllPhotos(){
 
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        List<Photo> photos = photoService.finAllByUserId(userDetails.getId());
-
+        List<Photo> photos = userDetails.getPhotos();
         return ResponseEntity.ok(photos);
     }
 }
