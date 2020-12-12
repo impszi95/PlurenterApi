@@ -5,6 +5,7 @@ import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
+import org.bson.types.ObjectId;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -29,6 +30,8 @@ public class PhotoService {
 
     public String addPhoto(MultipartFile file, String userId) throws Exception {
         Photo photo = new Photo();
+        String id = new ObjectId().toString();
+        photo.setId(id);
 
         BufferedImage img = ConvertBytesToImage(file.getBytes());
         BufferedImage resized = ResizeImage(img);
