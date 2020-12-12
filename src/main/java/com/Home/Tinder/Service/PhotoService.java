@@ -29,7 +29,6 @@ public class PhotoService {
 
     public String addPhoto(MultipartFile file, String userId) throws Exception {
         Photo photo = new Photo();
-        photo.setUserId(userId);
 
         BufferedImage img = ConvertBytesToImage(file.getBytes());
         BufferedImage resized = ResizeImage(img);

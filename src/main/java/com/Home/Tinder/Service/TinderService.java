@@ -118,4 +118,7 @@ public class TinderService {
         return matchedMeetsRes;
     }
 
+    public void XUserDislikeYUser(String idX, String idY) {
+        XMetY(idX,idY);
+    }
 }

@@ -32,12 +32,16 @@ public class TinderController {
     @PostMapping(value = "/likeUser")
     public ResponseEntity<String> LikeUser(@RequestParam("userId") String userId) throws IOException {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         tinderService.XUserLikesYUser(userDetails.getId(), userId);
-
         return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
+    @PostMapping(value = "/dislikeUser")
+    public ResponseEntity<String> DislikeUser(@RequestParam("userId") String userId) throws IOException {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        tinderService.XUserDislikeYUser(userDetails.getId(), userId);
+        return new ResponseEntity<>("Liked", HttpStatus.OK);
+    }
 
     @GetMapping("/getAllMatches")
     public ResponseEntity<?> getAllMatches(){
