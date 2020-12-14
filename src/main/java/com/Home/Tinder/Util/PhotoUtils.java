@@ -16,21 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-class ImageInformation {
-    public final int orientation;
-    public final int width;
-    public final int height;
 
-    public ImageInformation(int orientation, int width, int height) {
-        this.orientation = orientation;
-        this.width = width;
-        this.height = height;
-    }
-
-    public String toString() {
-        return String.format("%dx%d,%d", this.width, this.height, this.orientation);
-    }
-}
 public class PhotoUtils {
     public static ImageInformation readImageInformation(MultipartFile imageFile) throws IOException, MetadataException, ImageProcessingException {
         Metadata metadata = ImageMetadataReader.readMetadata(imageFile.getInputStream());
