@@ -3,6 +3,7 @@ package com.Home.Tinder.Service;
 import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
+import com.Home.Tinder.Util.PhotoUtils;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
@@ -18,6 +19,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +36,11 @@ public class PhotoService {
         photo.setId(id);
 
         BufferedImage img = ConvertBytesToImage(file.getBytes());
-        BufferedImage resized = ResizeImage(img);
-        byte[] resizedByte = ConvertImageToBytes(resized);
 
+        BufferedImage rot = PhotoUtils.Rotate(file,img);
+
+        BufferedImage resized = ResizeImage(rot);
+        byte[] resizedByte = ConvertImageToBytes(resized);
         photo.setImage(
                 new Binary(BsonBinarySubType.BINARY, resizedByte));
 
