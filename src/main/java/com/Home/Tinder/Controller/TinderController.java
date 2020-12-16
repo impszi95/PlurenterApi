@@ -24,29 +24,26 @@ public class TinderController {
 
     @GetMapping("/actualMeet")
     public ResponseEntity<?> actualMeet(){
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        MeetResponse meetResponse = tinderService.GetActualMeet(userDetails.getId());
+        MeetResponse meetResponse = tinderService.GetActualMeet();
         return ResponseEntity.ok(meetResponse);
     }
 
     @PostMapping(value = "/likeUser")
-    public ResponseEntity<String> LikeUser(@RequestParam("userId") String userId) throws IOException {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        tinderService.XUserLikesYUser(userDetails.getId(), userId);
+    public ResponseEntity<String> LikeUser() throws IOException {
+        tinderService.UserLikesActualMeet();
         return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
     @PostMapping(value = "/dislikeUser")
-    public ResponseEntity<String> DislikeUser(@RequestParam("userId") String userId) throws IOException {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        tinderService.XUserDislikeYUser(userDetails.getId(), userId);
+    public ResponseEntity<String> DislikeUser() throws IOException {
+        tinderService.UserDislikesActualMeet();
         return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
     @GetMapping("/getAllMatches")
     public ResponseEntity<?> getAllMatches(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<MeetResponse> matchesMeets = tinderService.GetAllMatchedMeets(userDetails.getId());
+        List<MeetResponse> matchesMeets = tinderService.GetAllMatchedMeets();
         return ResponseEntity.ok(matchesMeets);
     }
 }

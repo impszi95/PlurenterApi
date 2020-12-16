@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class PhotoUtils {
+public class PhotoRotate {
     public static ImageInformation readImageInformation(MultipartFile imageFile) throws IOException, MetadataException, ImageProcessingException {
         Metadata metadata = ImageMetadataReader.readMetadata(imageFile.getInputStream());
         Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
@@ -34,7 +34,6 @@ public class PhotoUtils {
 
         return new ImageInformation(orientation, width, height);
     }
-
     public static AffineTransform getExifTransformation(ImageInformation info) {
 
         AffineTransform t = new AffineTransform();
@@ -85,10 +84,14 @@ public class PhotoUtils {
         return t;
     }
     public static BufferedImage Rotate(MultipartFile file, BufferedImage image) throws Exception {
-        ImageInformation info = readImageInformation(file);
-        AffineTransform transform = getExifTransformation(info);
-        boolean isRotated = info.orientation >= 5;
-        return transformImage(image, transform, isRotated);
+        try {
+            ImageInformation info = readImageInformation(file);
+            AffineTransform transform = getExifTransformation(info);
+            boolean isRotated = info.orientation >= 5;
+            return transformImage(image, transform, isRotated);
+        }catch (Exception e){
+            return image;
+        }
     }
     private static BufferedImage transformImage(BufferedImage image, AffineTransform transform, boolean isRotated) throws IOException {
             AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC);

@@ -30,33 +30,12 @@ import java.util.stream.Collectors;
 @CrossOrigin
 @RestController
 public class UserController {
-//    @Autowired
-//    UserRepo userRepo;
-//
-//    @Autowired
-//    RoleRepository roleRepository;
-//
-//    @GetMapping("/roles")
-//    @CrossOrigin
-//    public ResponseEntity<List<Role>> getRoles() {
-//        List <Role> roles = roleRepository.findAll();
-//        return new ResponseEntity < >(roles, HttpStatus.OK);
-//    }
-//
-//    @PostMapping("/role")
-//    public ResponseEntity<Role> AddUser(@Valid @RequestBody Role role){
-//        roleRepository.save(role);
-//        return ResponseEntity.ok(role);
-//    }
 
     @Autowired
     UserRepo userRepo;
 
     @Autowired
     AuthenticationManager authenticationManager;
-
-//    @Autowired
-//    private ModelMapper modelMapper;
 
     @Autowired
     private PhotoService photoService;

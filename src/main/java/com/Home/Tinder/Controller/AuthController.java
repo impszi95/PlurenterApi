@@ -94,39 +94,6 @@ public class AuthController {
         User user = new User(signUpRequest.getUsername(),
                 encoder.encode(signUpRequest.getPassword()));
 
-//        Set<String> strRoles = signUpRequest.getRoles();
-//        Set<Role> roles = new HashSet<>();
-//
-//
-//        //Itt ez nemteljesen jó, redundáns, átírni a free-nek a beááállítását
-//        if (strRoles == null) {
-//            Role userRole = roleRepository.findById("ROLE_FREE")
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            roles.add(userRole);
-//        } else {
-//            strRoles.forEach(role -> {
-//                switch (role) {
-//                    case "admin":
-//                        Role adminRole = roleRepository.findById("5f7ba684d8cf01eedff0805d")
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(adminRole);
-//
-//                        break;
-//                    case "premium":
-//                        Role modRole = roleRepository.findById("ROLE_PREMIUM")
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(modRole);
-//
-//                        break;
-//                    default:
-//                        Role userRole = roleRepository.findById("ROLE_FREE")
-//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//                        roles.add(userRole);
-//                }
-//            });
-//        }
-//
-//        user.setRoles(roles);
         userRepo.save(user);
 
         //Put his id to meets hasset

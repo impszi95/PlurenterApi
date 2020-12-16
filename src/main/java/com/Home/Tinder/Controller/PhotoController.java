@@ -29,18 +29,21 @@ public class PhotoController {
 
 
     @PostMapping(value = "/photos/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> addPhoto(@RequestParam("userId") String userId, @RequestParam("file") MultipartFile image) throws Exception {
-
-        String id = photoService.addPhoto(image,userId);
-
+    public ResponseEntity<?> addPhoto(@RequestParam("file") MultipartFile image) throws Exception {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String id = photoService.addPhoto(image,userDetails.getId());
         return ResponseEntity.ok(id);
     }
 
     @GetMapping("/photos")
     public ResponseEntity<?> getAllPhotos(){
-
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Photo> photos = userDetails.getPhotos();
         return ResponseEntity.ok(photos);
+    }
+
+    @DeleteMapping("/deletePhoto/{photoId}")
+    public void deletePhoto(@PathVariable String photoId){
+        photoService.DeletePhoto(photoId);
     }
 }

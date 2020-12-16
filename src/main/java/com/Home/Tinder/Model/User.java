@@ -132,11 +132,7 @@ public class User {
         this.receivedLikesMeets.remove(meet);
     }
 
-//    public Set<Role> getRoles() {
-//        return roles;
-//    }
-//
-//    public void setRoles(Set<Role> roles) {
-//        this.roles = roles;
-//    }
+    public void deletePhoto(String photoId) {
+        this.photos.removeIf(photo -> photo.getId().equals(photoId));
+    }
 }

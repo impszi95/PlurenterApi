@@ -42,7 +42,10 @@ public class TinderService {
         userRepo.save(user);
     }
 
-    public MeetResponse GetActualMeet(String userId){
+    public MeetResponse GetActualMeet(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = userDetails.getId();
+
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
         String actualMeetId = user.getActualMeetId();
 
@@ -73,7 +76,11 @@ public class TinderService {
         SetNextUser(idX);
     }
 
-    public void XUserLikesYUser(String idX, String idY){
+    public void UserLikesActualMeet(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idX = userDetails.getId();
+        String idY = userDetails.getActualMeetId();
+
         XMetY(idX,idY);
         SaveLike(idX, idY);
         IncementLikes(idY);
@@ -106,7 +113,10 @@ public class TinderService {
         userRepo.save(userY);
     }
 
-    public List<MeetResponse> GetAllMatchedMeets(String idX){
+    public List<MeetResponse> GetAllMatchedMeets(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idX = userDetails.getId();
+
         List<MeetResponse> matchedMeetsRes = new ArrayList<>();
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
 
@@ -118,7 +128,11 @@ public class TinderService {
         return matchedMeetsRes;
     }
 
-    public void XUserDislikeYUser(String idX, String idY) {
+    public void UserDislikesActualMeet() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String idX = userDetails.getId();
+        String idY = userDetails.getActualMeetId();
+
         XMetY(idX,idY);
     }
 }
