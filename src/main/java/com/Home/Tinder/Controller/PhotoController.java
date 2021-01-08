@@ -27,7 +27,6 @@ public class PhotoController {
     @Autowired
     PhotoService photoService;
 
-
     @PostMapping(value = "/photos/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addPhoto(@RequestParam("file") MultipartFile image) throws Exception {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

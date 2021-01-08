@@ -3,6 +3,7 @@ package com.Home.Tinder.Controller;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Security.Payload.Response.MeetResponse;
 import com.Home.Tinder.Security.Payload.Response.UsersResponse;
+import com.Home.Tinder.Service.NotificationService;
 import com.Home.Tinder.Service.TinderService;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class TinderController {
 
     @Autowired
     TinderService tinderService;
+
+    @Autowired
+    NotificationService notiService;
 
     @GetMapping("/actualMeet")
     public ResponseEntity<?> actualMeet(){

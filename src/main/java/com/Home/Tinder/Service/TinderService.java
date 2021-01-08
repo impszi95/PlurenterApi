@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.management.Notification;
 import java.util.*;
 
 @Service
@@ -16,6 +17,9 @@ public class TinderService {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    NotificationService notificationService;
 
     private void SetNextUser(String userId) {
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
@@ -92,6 +96,8 @@ public class TinderService {
 
         boolean matched = userX.getReceivedLikesMeets().contains(idY);
         if (matched){
+            notificationService.NewMatchNotification(userX.getId(), userY.getId(),userX.getUsername(),userY.getUsername());
+
             userX.addMatchedMeet(idY);
             userX.removeReceivedMeet(idY);
 
