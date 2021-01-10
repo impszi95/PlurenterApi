@@ -11,6 +11,7 @@ import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,17 @@ public class PhotoService {
         userRepo.save(user);
 
         return photo.getId();
+    }
+
+    public byte[] getThumbnailForUser(String userId){
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
+
+        boolean photosNotEmpty = !user.getPhotos().isEmpty();
+        if(photosNotEmpty){
+            return user.getPhotos().get(0).getImage().getData();
+        }
+        return new byte[0];
     }
 
 }

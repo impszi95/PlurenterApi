@@ -1,5 +1,6 @@
 package com.Home.Tinder.Service;
 
+import com.Home.Tinder.Model.Notification;
 import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 import com.Home.Tinder.Repo.UserRepo;
@@ -9,7 +10,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.management.Notification;
 import java.util.*;
 
 @Service
@@ -20,6 +20,9 @@ public class TinderService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    PhotoService photoService;
 
     private void SetNextUser(String userId) {
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
@@ -86,17 +89,18 @@ public class TinderService {
         String idY = userDetails.getActualMeetId();
 
         XMetY(idX,idY);
-        SaveLike(idX, idY);
+        HandleLike(idX, idY);
         IncementLikes(idY);
     }
 
-    private void SaveLike(String idX, String idY) {
+    private void HandleLike(String idX, String idY) {
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
         User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
 
         boolean matched = userX.getReceivedLikesMeets().contains(idY);
         if (matched){
-            notificationService.NewMatchNotification(userX.getId(), userY.getId(),userX.getUsername(),userY.getUsername());
+            Notification newNotification = createNotification(userX,userY);
+            notificationService.NewMatchNotification(newNotification);
 
             userX.addMatchedMeet(idY);
             userX.removeReceivedMeet(idY);
@@ -110,6 +114,22 @@ public class TinderService {
         }
         userRepo.save(userX);
         userRepo.save(userY);
+    }
+
+    private Notification createNotification(User userX, User userY){
+        Notification notification = new Notification();
+
+        notification.setUserIdX(userX.getId());
+        notification.setUsernameX(userX.getUsername());
+        byte[] thumbnailX = photoService.getThumbnailForUser(userX.getId());
+        notification.setThumbnailX(thumbnailX);
+
+        notification.setUserIdY(userY.getId());
+        notification.setUsernameY(userY.getUsername());
+        byte[] thumbnailY = photoService.getThumbnailForUser(userY.getId());
+        notification.setThumbnailY(thumbnailY);
+
+        return notification;
     }
 
     public void IncementLikes(String idY){

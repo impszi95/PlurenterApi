@@ -1,5 +1,6 @@
 package com.Home.Tinder.Service;
 
+import com.Home.Tinder.Model.Notification;
 import lombok.Data;
 import org.apache.http.HttpMessage;
 import org.apache.http.protocol.HTTP;
@@ -21,9 +22,12 @@ public class NotificationService {
         return new RestTemplate();
     }
 
-    public void NewMatchNotification(String idX, String idY,String nameX, String nameY) {
+    public void NewMatchNotification(Notification notification) {
         String url = "http://localhost:8082";
+
+        HttpEntity<Notification> request = new HttpEntity<Notification>(notification);
+
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.exchange(url + "/notify/"+idX + "-"+nameX+"/"+idY+"-"+nameY, HttpMethod.GET,null, String.class);
+        restTemplate.postForEntity(url + "/notify",request, String.class);
     }
 }
