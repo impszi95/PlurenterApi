@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 public class PhotoResize {
     public static BufferedImage ResizeImage(BufferedImage originalImage) throws Exception {
         Dimension imgSize = new Dimension(originalImage.getWidth(), originalImage.getHeight());
-        Dimension boundary = new Dimension(600, 600);
+        Dimension boundary = new Dimension(800, 800);
         Dimension targetDimension = getScaledDimension(imgSize,boundary);
 
         return Scalr.resize(originalImage, Scalr.Method.QUALITY, targetDimension.width,targetDimension.height);

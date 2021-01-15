@@ -25,6 +25,8 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private String description;
+
 //    private Collection<? extends GrantedAuthority> authorities;
 
     private int likes;
@@ -33,19 +35,25 @@ public class UserDetailsImpl implements UserDetails {
 
     private List<Photo> photos;
 
-    private HashSet<String> getPreviousMeets;
+    private HashSet<String> previousMeets;
 
-    public UserDetailsImpl(String id, String username, int likes, String password,List<Photo> photos, String actualMeetId, HashSet<String> getPreviousMeets
+    private HashSet<String> matchedMeets;
+
+    public UserDetailsImpl(
+            String id, String username, int likes, String password,String description, List<Photo> photos,
+            String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.description = description;
 //        this.authorities = authorities;
         this.likes = likes;
         this.photos = photos;
         this.actualMeetId = actualMeetId;
-        this.getPreviousMeets = getPreviousMeets;
+        this.previousMeets = previousMeets;
+        this.matchedMeets = matchedMeets;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -57,10 +65,12 @@ public class UserDetailsImpl implements UserDetails {
                 user.getId(),
                 user.getUsername(),
                 user.getLikes(),
+                user.getDescription(),
                 user.getPassword(),
                 user.getPhotos(),
                 user.getActualMeetId(),
-                user.getPreviousMeets()
+                user.getPreviousMeets(),
+                user.getMatchedMeets()
 //                authorities
                 );
     }
@@ -122,11 +132,13 @@ public class UserDetailsImpl implements UserDetails {
         return Objects.equals(id, user.id);
     }
 
-
     public HashSet<String> getGetPreviousMeets() {
-        return getPreviousMeets;
+        return previousMeets;
     }
 
     public String getActualMeetId(){return  this.actualMeetId;}
 
+    public HashSet<String> getMatchedMeets(){return this.matchedMeets;}
+
+    public String getDescription(){return this.description;}
 }

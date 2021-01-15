@@ -18,7 +18,8 @@ public class User {
     @Size(max = 120)
     private String password;
 
-
+    @Size(max = 500)
+    private String description;
 
 //    @DBRef
 //    private Set<Role> roles;
@@ -40,6 +41,7 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.description = "";
         this.likes = 0;
         this.actualMeetId = "";
         this.photos = new ArrayList<>();
@@ -135,4 +137,6 @@ public class User {
     public void deletePhoto(String photoId) {
         this.photos.removeIf(photo -> photo.getId().equals(photoId));
     }
+    public void setDescription(String description){this.description = description;}
+    public String getDescription(){return this.description;}
 }

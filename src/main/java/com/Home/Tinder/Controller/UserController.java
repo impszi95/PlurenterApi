@@ -1,11 +1,13 @@
 package com.Home.Tinder.Controller;
 
 //import com.Home.Tinder.Model.Role;
+import com.Home.Tinder.Model.Match;
 import com.Home.Tinder.Model.Photo;
 import com.Home.Tinder.Model.User;
 //import com.Home.Tinder.Repo.RoleRepository;
 import com.Home.Tinder.Repo.UserRepo;
 import com.Home.Tinder.Security.Payload.Response.UsersResponse;
+import com.Home.Tinder.Service.MatchService;
 import com.Home.Tinder.Service.PhotoService;
 import com.Home.Tinder.Service.UserDetailsImpl;
 import org.modelmapper.ModelMapper;
@@ -33,6 +35,9 @@ public class UserController {
 
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    MatchService matchService;
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -71,6 +76,12 @@ public class UserController {
     public ResponseEntity<Integer> GetUsersLikes(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return new ResponseEntity<>(userDetails.getLikes(),HttpStatus.OK);
+    }
+
+    @GetMapping("/match/{matchId}")
+    public ResponseEntity<?> getAllPhotos(@PathVariable String matchId){
+        Match match = matchService.getMatch(matchId);
+        return ResponseEntity.ok(match);
     }
 
     }
