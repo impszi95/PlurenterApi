@@ -67,6 +67,7 @@ public class UserDetailsImpl implements UserDetails {
                 user.getLikes(),
                 user.getDescription(),
                 user.getPassword(),
+                user.getDescription(),
                 user.getPhotos(),
                 user.getActualMeetId(),
                 user.getPreviousMeets(),
