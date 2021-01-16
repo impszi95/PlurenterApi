@@ -23,7 +23,7 @@ public class NotificationService {
     }
 
     public void NewMatchNotification(Notification notification) {
-        String url = "http://localhost:8082";
+        String url = "http://194.156.81.191:8082";
 
         HttpEntity<Notification> request = new HttpEntity<Notification>(notification);
 
