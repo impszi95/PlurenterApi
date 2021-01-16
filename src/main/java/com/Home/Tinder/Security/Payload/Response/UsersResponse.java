@@ -13,5 +13,6 @@ public class UsersResponse {
     private String username;
     private List<Binary> photos;
     private int likes;
+    private String description;
 
 }

@@ -12,6 +12,5 @@ public class JwtResponse {
     private String token;
     private String id;
     private String username;
-    private int like;
 //    private List<String> roles;
 }
