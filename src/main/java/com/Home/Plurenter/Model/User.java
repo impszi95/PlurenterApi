@@ -18,6 +18,8 @@ public class User {
     @Size(max = 120)
     private String password;
 
+    private boolean isTenant;
+
     @Size(max = 500)
     private String description;
 
@@ -49,9 +51,18 @@ public class User {
         this.matchedMeets = new HashSet<>();
         this.likedMeets = new HashSet<>();
         this.receivedLikesMeets = new HashSet<>();
+        this.isTenant = true;
     }
 
-
+    public boolean getIsTenant(){return this.isTenant;}
+    public void setIsTenant(String type){
+        if (type.equals("tenant")){
+            this.isTenant = true;
+        }
+        else if (type.equals("landlord")){
+            this.isTenant = false;
+        }
+    }
     public int getLikes(){
         return likes;
     }

@@ -5,7 +5,6 @@ import javax.validation.Valid;
 //import com.Home.Tinder.Model.ERole;
 //import com.Home.Tinder.Model.Role;
 import com.Home.Plurenter.Service.UserDetailsImpl;
-import com.Home.Plurenter.Model.User;
 //import com.Home.Tinder.Repo.RoleRepository;
 import com.Home.Plurenter.Repo.UserRepo;
 import com.Home.Plurenter.Security.Payload.Request.LoginRequest;
@@ -13,14 +12,13 @@ import com.Home.Plurenter.Security.Payload.Request.SignupRequest;
 import com.Home.Plurenter.Security.Payload.Response.JwtResponse;
 import com.Home.Plurenter.Security.Payload.Response.MessageResponse;
 import com.Home.Plurenter.Security.jwt.JwtUtils;
+import com.Home.Plurenter.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,12 +34,9 @@ public class AuthController {
 
     @Autowired
     UserRepo userRepo;
-//
-//    @Autowired
-//    RoleRepository roleRepository;
 
     @Autowired
-    PasswordEncoder encoder;
+    UserService userService;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -76,17 +71,7 @@ public class AuthController {
                     .body(new MessageResponse("Error: Username is already taken!"));
         }
 
-
-        // Create new user's account
-        User user = new User(signUpRequest.getUsername(),
-                encoder.encode(signUpRequest.getPassword()));
-
-        userRepo.save(user);
-
-        //Put his id to meets hasset
-        User _user = userRepo.findByUsername(user.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username not exists"));
-        _user.addPreviousMeets(user.getId());
-        userRepo.save(_user);
+        userService.CreateNewUser(signUpRequest);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }

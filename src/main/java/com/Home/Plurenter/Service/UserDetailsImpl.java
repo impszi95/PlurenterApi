@@ -19,6 +19,8 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
 
+    private boolean isTenant;
+
     private String description;
 
 //    private Collection<? extends GrantedAuthority> authorities;
@@ -34,13 +36,14 @@ public class UserDetailsImpl implements UserDetails {
     private HashSet<String> matchedMeets;
 
     public UserDetailsImpl(
-            String id, String username, int likes, String password,String description, List<Photo> photos,
+            String id, String username,boolean isTenant, int likes, String password,String description, List<Photo> photos,
             String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.isTenant = isTenant;
         this.description = description;
 //        this.authorities = authorities;
         this.likes = likes;
@@ -58,6 +61,7 @@ public class UserDetailsImpl implements UserDetails {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
+                user.getIsTenant(),
                 user.getLikes(),
                 user.getPassword(),
                 user.getDescription(),
@@ -76,6 +80,7 @@ public class UserDetailsImpl implements UserDetails {
         return likes;
     }
 
+    public boolean getIsTenant(){return isTenant;}
 
     public List<Photo> getPhotos(){
         return photos;
