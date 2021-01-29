@@ -7,6 +7,7 @@ import com.Home.Plurenter.Repo.UserRepo;
 import com.Home.Plurenter.Security.Payload.Response.MeetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.expression.spel.ast.Operator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class TinderService {
     @Autowired
     PhotoService photoService;
 
-    private void SetNextUser(String userId) {
+    private boolean SetNextUser(String userId) { //Return isSucceed
         //Ha userID queue<20 akk léterhozok 20nagy queue-t
         //kül peek()et-->TindernextResp-t visszaadom, aztán remove first-ölöm
         Random rand = new Random();
@@ -40,24 +41,55 @@ public class TinderService {
         else{
             repo_size = tenantRepo.findAll().size();
         }
-
-        if (repo_size == user.getPreviousMeets().size())
-        {
-            user.setActualMeetId("");
-            userRepo.save(user);
-            return;
-        }
-
+        //Without confitions //All visited
+//        if (repo_size == user.getPreviousMeets().size())
+//        {
+//            user.setActualMeetId("");
+//            userRepo.save(user);
+//            return;
+//        }
         String rndUserId = "";
-        if (user.getIsTenant()) {
-            do {
-                rndUserId = landlordRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
-            } while (user.getPreviousMeets().contains(rndUserId));
+        boolean foundMeet = false;
+        if (!user.getIsTenant()) {
+            for (int i=0;i<repo_size*2;i++){
+                rndUserId = tenantRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+                boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
+                if (haventMet){
+                    Tenant probMeet = tenantRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                    boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
+                    if (tenantFitsConditions){
+                        i=repo_size*2;
+                        foundMeet = true;
+                    }
+                }
+            }
+            //Without confitions
+//            do {
+//                rndUserId = landlordRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+//            } while (user.getPreviousMeets().contains(rndUserId));
         }
         else{
-            do {
-                rndUserId = tenantRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
-            } while (user.getPreviousMeets().contains(rndUserId));
+            for (int i=0;i<repo_size*2;i++){
+                rndUserId = landlordRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+                boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
+                if (haventMet){
+                    Landlord probMeet = landlordRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                    boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
+                    if (landlordFitsConditions){
+                        i=repo_size*2;
+                        foundMeet = true;
+                    }
+                }
+            }
+//            do {
+//                rndUserId = tenantRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+//            } while (user.getPreviousMeets().contains(rndUserId));
+        }
+        //All visited (with conditions means 1000 try
+        if(!foundMeet){
+            user.setActualMeetId("");
+            userRepo.save(user);
+            return false;
         }
 
         String finalRndUserId = rndUserId;
@@ -65,7 +97,25 @@ public class TinderService {
 
         user.setActualMeetId(nextMeet.getId());
         userRepo.save(user);
+        return true;
     }
+
+    private boolean CheckConditionsForLandlord(User user, Landlord probMeet) {
+        Tenant tenant = tenantRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
+        if (probMeet.getMinRentTime().isLessOrEqualsThan(tenant.getMinRentTime())){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean CheckConditionsForTenant(User user, Tenant probMeet) {
+        Landlord landlord = landlordRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
+        if (probMeet.getMinRentTime().isMoreOrEqualsThan(landlord.getMinRentTime())){
+            return true;
+        }
+        return false;
+    }
+
     public MeetResponse GetActualMeet(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
@@ -75,24 +125,15 @@ public class TinderService {
 
         //First/Empty login
         if(actualMeetId.equals("")){
-            SetNextUser(user.getId());
-            user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
-            actualMeetId = user.getActualMeetId();
+            boolean isSucceed = SetNextUser(user.getId());  // SetNext  AND Check if Met with all already
+            if (isSucceed) {
+                user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
+                actualMeetId = user.getActualMeetId();
+            }
+            else{
+                return new MeetResponse("", "", new ArrayList<Photo>());
+            }
         }
-
-        //Met with all already
-        int repo_size = 0;
-        if (user.getIsTenant()){
-            repo_size = landlordRepo.findAll().size();
-        }
-        else{
-            repo_size = tenantRepo.findAll().size();
-        }
-        if (repo_size == user.getPreviousMeets().size())
-        {
-            return new MeetResponse("", "", new ArrayList<Photo>());
-        }
-
         String finalActualMeetId = actualMeetId;
         User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("actualMeet Not Found with userId: "+ finalActualMeetId));
         return new MeetResponse(actualMeet.getId(), actualMeet.getUsername(), actualMeet.getPhotos());

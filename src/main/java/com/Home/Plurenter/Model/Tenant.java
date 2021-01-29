@@ -19,12 +19,23 @@ public class Tenant{
     @NotBlank
     private String username;
 
+    private MinRentTime minRentTime;
+
     public Tenant(String username, String commonId){
         this.username = username;
         this.commonId = commonId;
+        this.minRentTime = new MinRentTime();
     }
 
     public String getCommonId(){
         return this.commonId;
+    }
+    public MinRentTime getMinRentTime(){return this.minRentTime;}
+    public void setMinRentTime(int year, int month, int day) {
+        MinRentTime minRentTime = new MinRentTime();
+        minRentTime.setYear(year);
+        minRentTime.setMonth(month);
+        minRentTime.setDay(day);
+        this.minRentTime = minRentTime;
     }
 }
