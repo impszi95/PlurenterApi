@@ -12,5 +12,6 @@ public class JwtResponse {
     private String token;
     private String id;
     private String username;
+    private boolean isTenant;
 //    private List<String> roles;
 }

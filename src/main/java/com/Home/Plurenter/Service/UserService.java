@@ -47,10 +47,6 @@ public class UserService {
         System.out.println("Unauthorized match query!");
         return new Match();
     }
-//    public void MakeSelfMet(User user){
-//        user.addPreviousMeets(user.getId());
-//        userRepo.save(user);
-//    }
     public void CreateNewUser(SignupRequest signUpRequest){
         User user = new User(signUpRequest.getUsername(),
                 encoder.encode(signUpRequest.getPassword()));
