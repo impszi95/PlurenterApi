@@ -1,11 +1,8 @@
 package com.Home.Plurenter.Controller;
 
 //import com.Home.Tinder.Model.Role;
-import com.Home.Plurenter.Model.Match;
-import com.Home.Plurenter.Model.Photo;
-import com.Home.Plurenter.Model.User;
+import com.Home.Plurenter.Model.*;
 //import com.Home.Tinder.Repo.RoleRepository;
-import com.Home.Plurenter.Model.UserInfo;
 import com.Home.Plurenter.Repo.UserRepo;
 import com.Home.Plurenter.Security.Payload.Response.UsersResponse;
 import com.Home.Plurenter.Service.PhotoService;
@@ -65,28 +62,33 @@ public class UserController {
         return res;
     }
 
-    @GetMapping("/getUsersLikes")
-    public ResponseEntity<Integer> GetUsersLikes() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return new ResponseEntity<>(userDetails.getLikes(), HttpStatus.OK);
-    }
+//    @GetMapping("/match/{matchId}")
+//    public ResponseEntity<?> getAllPhotos(@PathVariable String matchId) {
+//        Match match = userService.getMatch(matchId);
+//        return ResponseEntity.ok(match);
+//    }
 
-    @GetMapping("/match/{matchId}")
-    public ResponseEntity<?> getAllPhotos(@PathVariable String matchId) {
-        Match match = userService.getMatch(matchId);
-        return ResponseEntity.ok(match);
-    }
-
-    @PostMapping(value = "/user/save")
-    public ResponseEntity<?> saveInfos(@RequestBody UserInfo infos) {
-        userService.saveUserInfos(infos);
+    @PostMapping(value = "/tenant/save")
+    public ResponseEntity<?> saveTenantInfos(@RequestBody TenantInfo infos) {
+        userService.SaveTenantInfos(infos);
         return ResponseEntity.ok(infos);
     }
-
-    @GetMapping("/description")
-    public ResponseEntity<?> getDescription() {
+    @GetMapping("/getTenantInfo")
+    public ResponseEntity<?> getTenantInfo() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ResponseEntity.ok(userDetails.getDescription());
+        TenantInfo tenantInfo = userService.GetTenant();
+        return ResponseEntity.ok(tenantInfo);
+    }
+    @PostMapping(value = "/landlord/save")
+    public ResponseEntity<?> saveLandlordInfos(@RequestBody LandlordInfo infos) {
+        userService.SaveLandlordInfos(infos);
+        return ResponseEntity.ok(infos);
+    }
+    @GetMapping("/getLandlordInfo")
+    public ResponseEntity<?> getLandlordInfo() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LandlordInfo landlordInfo = userService.GetLandlord();
+        return ResponseEntity.ok(landlordInfo);
     }
 }
 

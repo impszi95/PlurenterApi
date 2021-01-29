@@ -8,6 +8,11 @@ public class MinRentTime {
     private int month;
     private int year;
 
+    public MinRentTime(){
+        this.year = 0;
+        this.month = 0;
+        this.day = 0;
+    }
 
     public String toString(){
         String result = "";

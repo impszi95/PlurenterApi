@@ -31,11 +31,7 @@ public class Tenant{
         return this.commonId;
     }
     public MinRentTime getMinRentTime(){return this.minRentTime;}
-    public void setMinRentTime(int year, int month, int day) {
-        MinRentTime minRentTime = new MinRentTime();
-        minRentTime.setYear(year);
-        minRentTime.setMonth(month);
-        minRentTime.setDay(day);
+    public void setMinRentTime(MinRentTime minRentTime) {
         this.minRentTime = minRentTime;
     }
 }
