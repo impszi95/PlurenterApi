@@ -1,4 +1,4 @@
-package com.Home.Plurenter.Security.Payload.Response;
+package com.Home.Plurenter.Security.Payload.Response.Match;
 
 import com.Home.Plurenter.Model.MinRentTime;
 import com.Home.Plurenter.Model.Photo;
@@ -12,5 +12,5 @@ public class MatchResponse {
     private String description;
     private List<Photo> photos;
     private boolean isTenant;
-    private MinRentTime minRentTime;
+    private String minRentTime;
 }

@@ -1,8 +1,8 @@
 package com.Home.Plurenter.Controller;
 
-import com.Home.Plurenter.Security.Payload.Response.MeetResponse;
+import com.Home.Plurenter.Security.Payload.Response.Meet.MeetResponse;
 import com.Home.Plurenter.Service.NotificationService;
-import com.Home.Plurenter.Service.TinderService;
+import com.Home.Plurenter.Service.PlurenterService;
 import com.Home.Plurenter.Service.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,36 +15,36 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-public class TinderController {
+public class PlurenterController {
 
     @Autowired
-    TinderService tinderService;
+    PlurenterService plurenterService;
 
     @Autowired
     NotificationService notiService;
 
     @GetMapping("/actualMeet")
     public ResponseEntity<?> actualMeet(){
-        MeetResponse meetResponse = tinderService.GetActualMeet();
+        MeetResponse meetResponse = plurenterService.GetActualMeet();
         return ResponseEntity.ok(meetResponse);
     }
 
     @PostMapping(value = "/likeUser")
     public ResponseEntity<String> LikeUser() throws IOException {
-        tinderService.UserLikesActualMeet();
+        plurenterService.UserLikesActualMeet();
         return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
     @PostMapping(value = "/dislikeUser")
     public ResponseEntity<String> DislikeUser() throws IOException {
-        tinderService.UserDislikesActualMeet();
+        plurenterService.UserDislikesActualMeet();
         return new ResponseEntity<>("Liked", HttpStatus.OK);
     }
 
     @GetMapping("/getAllMatches")
     public ResponseEntity<?> getAllMatches(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<MeetResponse> matchesMeets = tinderService.GetAllMatchedMeets();
+        List<MeetResponse> matchesMeets = plurenterService.GetAllMatchedMeets();
         return ResponseEntity.ok(matchesMeets);
     }
 }

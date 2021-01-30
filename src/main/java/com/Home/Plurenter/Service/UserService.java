@@ -5,9 +5,9 @@ import com.Home.Plurenter.Repo.LandlordRepo;
 import com.Home.Plurenter.Repo.TenantRepo;
 import com.Home.Plurenter.Repo.UserRepo;
 import com.Home.Plurenter.Security.Payload.Request.SignupRequest;
-import com.Home.Plurenter.Security.Payload.Response.LandlordResponse;
-import com.Home.Plurenter.Security.Payload.Response.MatchResponse;
-import com.Home.Plurenter.Security.Payload.Response.TenantResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.LandlordMatchResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.TenantMatchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -54,25 +54,25 @@ public class UserService {
             User matchedUser = userRepo.findById(matchId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchId));
             if (userDetails.getIsTenant() && !matchedUser.getIsTenant()){//Match is a valid landlord
                 Landlord landlord = landlordRepo.findByCommonId(matchedUser.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedUser.getId()));
-                LandlordResponse landlordResponse = new LandlordResponse();
-                landlordResponse.setUsername(matchedUser.getUsername());
-                landlordResponse.setDescription(matchedUser.getDescription());
-                landlordResponse.setPhotos(matchedUser.getPhotos());
-                landlordResponse.setTenant(matchedUser.getIsTenant());
+                LandlordMatchResponse landlordMatchResponse = new LandlordMatchResponse();
+                landlordMatchResponse.setUsername(matchedUser.getUsername());
+                landlordMatchResponse.setDescription(matchedUser.getDescription());
+                landlordMatchResponse.setPhotos(matchedUser.getPhotos());
+                landlordMatchResponse.setTenant(matchedUser.getIsTenant());
 
-                landlordResponse.setMinRentTime(landlord.getMinRentTime());
-                return landlordResponse;
+                landlordMatchResponse.setMinRentTime(landlord.getMinRentTime().toString());
+                return landlordMatchResponse;
             }
             if (!userDetails.getIsTenant() && matchedUser.getIsTenant()) { //Match is a valid tenant
                 Tenant tenant = tenantRepo.findByCommonId(matchedUser.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedUser.getId()));
-                TenantResponse tenantResponse = new TenantResponse();
-                tenantResponse.setUsername(matchedUser.getUsername());
-                tenantResponse.setDescription(matchedUser.getDescription());
-                tenantResponse.setPhotos(matchedUser.getPhotos());
-                tenantResponse.setTenant(matchedUser.getIsTenant());
+                TenantMatchResponse tenantMatchResponse = new TenantMatchResponse();
+                tenantMatchResponse.setUsername(matchedUser.getUsername());
+                tenantMatchResponse.setDescription(matchedUser.getDescription());
+                tenantMatchResponse.setPhotos(matchedUser.getPhotos());
+                tenantMatchResponse.setTenant(matchedUser.getIsTenant());
 
-                tenantResponse.setMinRentTime(tenant.getMinRentTime());
-                return tenantResponse;
+                tenantMatchResponse.setMinRentTime(tenant.getMinRentTime().toString());
+                return tenantMatchResponse;
             }
             System.out.println("Queried match and user is in the same role.");
             return new MatchResponse();

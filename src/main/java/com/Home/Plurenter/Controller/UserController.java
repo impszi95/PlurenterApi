@@ -4,8 +4,7 @@ package com.Home.Plurenter.Controller;
 import com.Home.Plurenter.Model.*;
 //import com.Home.Tinder.Repo.RoleRepository;
 import com.Home.Plurenter.Repo.UserRepo;
-import com.Home.Plurenter.Security.Payload.Response.MatchResponse;
-import com.Home.Plurenter.Security.Payload.Response.UsersResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
 import com.Home.Plurenter.Service.PhotoService;
 import com.Home.Plurenter.Service.UserDetailsImpl;
 import com.Home.Plurenter.Service.UserService;
@@ -15,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @CrossOrigin
 @RestController

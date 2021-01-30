@@ -4,10 +4,10 @@ import com.Home.Plurenter.Model.*;
 import com.Home.Plurenter.Repo.LandlordRepo;
 import com.Home.Plurenter.Repo.TenantRepo;
 import com.Home.Plurenter.Repo.UserRepo;
-import com.Home.Plurenter.Security.Payload.Response.MeetResponse;
+import com.Home.Plurenter.Security.Payload.Response.Meet.LandlordMeetResponse;
+import com.Home.Plurenter.Security.Payload.Response.Meet.MeetResponse;
+import com.Home.Plurenter.Security.Payload.Response.Meet.TenantMeetResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.expression.spel.ast.Operator;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class TinderService {
+public class PlurenterService {
     @Autowired
     UserRepo userRepo;
     @Autowired
@@ -28,8 +28,6 @@ public class TinderService {
     PhotoService photoService;
 
     private boolean SetNextUser(String userId) { //Return isSucceed
-        //Ha userID queue<20 akk léterhozok 20nagy queue-t
-        //kül peek()et-->TindernextResp-t visszaadom, aztán remove first-ölöm
         Random rand = new Random();
         User user = userRepo.findById(userId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: userId"));
 
@@ -107,7 +105,6 @@ public class TinderService {
         }
         return false;
     }
-
     private boolean CheckConditionsForTenant(User user, Tenant probMeet) {
         Landlord landlord = landlordRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
         if (probMeet.getMinRentTime().isMoreOrEqualsThan(landlord.getMinRentTime())){
@@ -131,12 +128,36 @@ public class TinderService {
                 actualMeetId = user.getActualMeetId();
             }
             else{
-                return new MeetResponse("", "", new ArrayList<Photo>());
+                return new MeetResponse();
             }
         }
         String finalActualMeetId = actualMeetId;
         User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("actualMeet Not Found with userId: "+ finalActualMeetId));
-        return new MeetResponse(actualMeet.getId(), actualMeet.getUsername(), actualMeet.getPhotos());
+
+        if (user.getIsTenant() && !actualMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
+            LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
+            landlordMeetResponse.setId(actualMeet.getId());
+            landlordMeetResponse.setUsername(actualMeet.getUsername());
+            landlordMeetResponse.setPhotos(actualMeet.getPhotos());
+            landlordMeetResponse.setDescription(actualMeet.getDescription());
+
+            Landlord landlord = landlordRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
+            landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
+            return landlordMeetResponse;
+        }
+        if (!user.getIsTenant() && actualMeet.getIsTenant()){
+            TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
+            tenantMeetResponse.setId(actualMeet.getId());
+            tenantMeetResponse.setUsername(actualMeet.getUsername());
+            tenantMeetResponse.setPhotos(actualMeet.getPhotos());
+            tenantMeetResponse.setDescription(actualMeet.getDescription());
+
+            Tenant tenant = tenantRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
+            tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
+            return tenantMeetResponse;
+        }
+        System.out.println("Queried meet and user is in the same role.");
+        return new MeetResponse();
     }
 
     public void XMetY(String idX, String idY){
@@ -216,8 +237,30 @@ public class TinderService {
 
         for (String matchedMeetId : userX.getMatchedMeets()){
             User matchedMeet = userRepo.findById(matchedMeetId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
-            MeetResponse matchedMeetRes = new MeetResponse(matchedMeet.getId(), matchedMeet.getUsername(), matchedMeet.getPhotos());
-            matchedMeetsRes.add(matchedMeetRes);
+            if (userX.getIsTenant() && !matchedMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
+                LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
+                landlordMeetResponse.setId(matchedMeet.getId());
+                landlordMeetResponse.setUsername(matchedMeet.getUsername());
+                landlordMeetResponse.setPhotos(matchedMeet.getPhotos());
+                landlordMeetResponse.setDescription(matchedMeet.getDescription());
+
+                Landlord landlord = landlordRepo.findByCommonId(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
+                landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
+                matchedMeetsRes.add(landlordMeetResponse);
+            }
+            if (!userX.getIsTenant() && matchedMeet.getIsTenant()){
+                TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
+                tenantMeetResponse.setId(matchedMeet.getId());
+                tenantMeetResponse.setUsername(matchedMeet.getUsername());
+                tenantMeetResponse.setPhotos(matchedMeet.getPhotos());
+                tenantMeetResponse.setDescription(matchedMeet.getDescription());
+
+                Tenant tenant = tenantRepo.findByCommonId(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
+                tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
+                matchedMeetsRes.add(tenantMeetResponse);
+            }else {
+                System.out.println("Queried meet and user is in the same role." + userX.getUsername() +", "+matchedMeet.getUsername());
+            }
         }
         return matchedMeetsRes;
     }

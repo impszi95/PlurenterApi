@@ -19,28 +19,28 @@ public class MinRentTime {
         if (year != 0){
             result+=year;
             if (year==1){
-                result+= month==0 && day==0? "year" : " year, ";
+                result+= month==0 && day==0? " year " : " year, ";
             }
             else {
-                result+= month==0 && day==0? "years" : " years, ";
+                result+= month==0 && day==0? " years" : " years, ";
             }
         }
         if (month != 0){
             result+=month;
             if (month==1){
-                result+= day==0? "month" : " month, ";
+                result+= day==0? " month" : " month, ";
             }
             else {
-                result+= day==0? "months" : "months, ";
+                result+= day==0? " months" : " months, ";
             }
         }
         if (day != 0){
             result+=day;
             if (day==1){
-                result+="day";
+                result+=" day";
             }
             else {
-                result+="days";
+                result+=" days";
             }
         }
         return result;
