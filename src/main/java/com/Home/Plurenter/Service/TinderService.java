@@ -164,7 +164,11 @@ public class TinderService {
         boolean matched = userX.getReceivedLikesMeets().contains(idY);
         if (matched){
             Notification newNotification = createNotification(userX,userY);
-            notificationService.NewMatchNotification(newNotification);
+            try {
+                notificationService.NewMatchNotification(newNotification);
+            }catch (Exception e){
+                System.out.println("Notification service down.");
+            }
 
             userX.addMatchedMeet(idY);
             userX.removeReceivedMeet(idY);
