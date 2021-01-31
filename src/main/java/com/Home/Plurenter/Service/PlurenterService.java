@@ -49,15 +49,29 @@ public class PlurenterService {
         String rndUserId = "";
         boolean foundMeet = false;
         if (!user.getIsTenant()) {
-            for (int i=0;i<repo_size*2;i++){
+            for (int i=0;i<repo_size;i++){  //Try N random
                 rndUserId = tenantRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
                     Tenant probMeet = tenantRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                     boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
                     if (tenantFitsConditions){
-                        i=repo_size*2;
+                        i=repo_size;
                         foundMeet = true;
+                    }
+                }
+            }
+            if (!foundMeet){
+                for (int i = 0;i<repo_size;i++){    //If no random, Go through sequential
+                    rndUserId = tenantRepo.findAll().get(i).getCommonId();
+                    boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
+                    if (haventMet){
+                        Tenant probMeet = tenantRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                        boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
+                        if (tenantFitsConditions){
+                            i=repo_size;
+                            foundMeet = true;
+                        }
                     }
                 }
             }
@@ -67,15 +81,29 @@ public class PlurenterService {
 //            } while (user.getPreviousMeets().contains(rndUserId));
         }
         else{
-            for (int i=0;i<repo_size*2;i++){
+            for (int i=0;i<repo_size;i++){
                 rndUserId = landlordRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
                     Landlord probMeet = landlordRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                     boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
                     if (landlordFitsConditions){
-                        i=repo_size*2;
+                        i=repo_size;
                         foundMeet = true;
+                    }
+                }
+            }
+            if (!foundMeet){
+                for (int i = 0;i<repo_size;i++){    //If no random, Go through sequential
+                    rndUserId = landlordRepo.findAll().get(i).getCommonId();
+                    boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
+                    if (haventMet){
+                        Landlord probMeet = landlordRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                        boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
+                        if (landlordFitsConditions){
+                            i=repo_size;
+                            foundMeet = true;
+                        }
                     }
                 }
             }
