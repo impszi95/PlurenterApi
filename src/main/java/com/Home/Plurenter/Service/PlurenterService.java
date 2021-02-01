@@ -166,22 +166,26 @@ public class PlurenterService {
             LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
             landlordMeetResponse.setId(actualMeet.getId());
             landlordMeetResponse.setUsername(actualMeet.getUsername());
+            landlordMeetResponse.setTenant(actualMeet.getIsTenant());
             landlordMeetResponse.setPhotos(actualMeet.getPhotos());
             landlordMeetResponse.setDescription(actualMeet.getDescription());
 
             Landlord landlord = landlordRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
             landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
+            landlordMeetResponse.setRent(landlord.getRent().toString());
             return landlordMeetResponse;
         }
         if (!user.getIsTenant() && actualMeet.getIsTenant()){
             TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
             tenantMeetResponse.setId(actualMeet.getId());
             tenantMeetResponse.setUsername(actualMeet.getUsername());
+            tenantMeetResponse.setTenant(actualMeet.getIsTenant());
             tenantMeetResponse.setPhotos(actualMeet.getPhotos());
             tenantMeetResponse.setDescription(actualMeet.getDescription());
 
             Tenant tenant = tenantRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
             tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
+            tenantMeetResponse.setJob(tenant.getJob());
             return tenantMeetResponse;
         }
         System.out.println("Queried meet and user is in the same role.");
@@ -276,7 +280,7 @@ public class PlurenterService {
                 landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
                 matchedMeetsRes.add(landlordMeetResponse);
             }
-            if (!userX.getIsTenant() && matchedMeet.getIsTenant()){
+            else if (!userX.getIsTenant() && matchedMeet.getIsTenant()){
                 TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
                 tenantMeetResponse.setId(matchedMeet.getId());
                 tenantMeetResponse.setUsername(matchedMeet.getUsername());

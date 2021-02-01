@@ -28,25 +28,37 @@ public class UserService {
     @Autowired
     private LandlordRepo landlordRepo;
 
+    @Autowired
+    private Valider valider;
+
     public void SaveTenantInfos(TenantInfo infos) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepo.findById(userDetails.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userDetails.getId()));
         Tenant tenant = tenantRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + user.getId()));
         user.setDescription(infos.getDescription()); //common prop
+
         tenant.setMinRentTime(infos.getMinRentTime()); //uniqe prop
-        userRepo.save(user);
-        tenantRepo.save(tenant);
+        tenant.setJob(infos.getJob());
+
+        if (valider.ValidTenantDatas(tenant)){
+            userRepo.save(user);
+            tenantRepo.save(tenant);
+        }
     }
     public void SaveLandlordInfos(LandlordInfo infos) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepo.findById(userDetails.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userDetails.getId()));
         Landlord landlord = landlordRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + user.getId()));
         user.setDescription(infos.getDescription()); //common prop
+
         landlord.setMinRentTime(infos.getMinRentTime()); //unique prop
-        userRepo.save(user);
-        landlordRepo.save(landlord);
+        landlord.setRent(infos.getRent());
+
+        if (valider.ValidLandlordDatas(landlord)) {
+            userRepo.save(user);
+            landlordRepo.save(landlord);
+        }
     }
-    //<----- divide to tenant/landlord!!!
     public MatchResponse GetMatch(String matchId) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean validMatch = userDetails.getMatchedMeets().contains(matchId);
@@ -61,6 +73,7 @@ public class UserService {
                 landlordMatchResponse.setTenant(matchedUser.getIsTenant());
 
                 landlordMatchResponse.setMinRentTime(landlord.getMinRentTime().toString());
+                landlordMatchResponse.setRent(landlord.getRent().toString());
                 return landlordMatchResponse;
             }
             if (!userDetails.getIsTenant() && matchedUser.getIsTenant()) { //Match is a valid tenant
@@ -72,6 +85,7 @@ public class UserService {
                 tenantMatchResponse.setTenant(matchedUser.getIsTenant());
 
                 tenantMatchResponse.setMinRentTime(tenant.getMinRentTime().toString());
+                tenantMatchResponse.setJob(tenant.getJob());
                 return tenantMatchResponse;
             }
             System.out.println("Queried match and user is in the same role.");
@@ -91,6 +105,7 @@ public class UserService {
             tenantInfo.setLikes(user.getLikes());
             tenantInfo.setDescription(user.getDescription());
             tenantInfo.setMinRentTime(tenant.getMinRentTime());
+            tenantInfo.setJob(tenant.getJob());
             return tenantInfo;
         }
         System.out.println("Unauthorized tenant query!");
@@ -107,6 +122,7 @@ public class UserService {
             landlordInfo.setLikes(user.getLikes());
             landlordInfo.setDescription(user.getDescription());
             landlordInfo.setMinRentTime(landlord.getMinRentTime());
+            landlordInfo.setRent(landlord.getRent());
             return landlordInfo;
         }
         System.out.println("Unauthorized landlord query!");

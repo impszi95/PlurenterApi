@@ -21,10 +21,13 @@ public class Tenant{
 
     private MinRentTime minRentTime;
 
+    private String job;
+
     public Tenant(String username, String commonId){
         this.username = username;
         this.commonId = commonId;
         this.minRentTime = new MinRentTime();
+        this.job = "";
     }
 
     public String getCommonId(){
@@ -34,4 +37,6 @@ public class Tenant{
     public void setMinRentTime(MinRentTime minRentTime) {
         this.minRentTime = minRentTime;
     }
+    public String getJob(){return this.job;}
+    public void setJob(String job){this.job = job;}
 }

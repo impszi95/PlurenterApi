@@ -7,4 +7,5 @@ public class TenantInfo {
     private int likes;
     private MinRentTime minRentTime;
     private String description;
+    private String job;
 }
