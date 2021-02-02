@@ -40,6 +40,8 @@ public class User {
 
     private List<Photo> photos;
 
+    private boolean active;
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
@@ -52,6 +54,7 @@ public class User {
         this.likedMeets = new HashSet<>();
         this.receivedLikesMeets = new HashSet<>();
         this.isTenant = true;
+        this.active = active;
     }
 
     public boolean getIsTenant(){return this.isTenant;}
@@ -150,4 +153,6 @@ public class User {
     }
     public void setDescription(String description){this.description = description;}
     public String getDescription(){return this.description;}
+    public boolean getActive(){return this.active;}
+    public void setActive(boolean active){this.active = active;}
 }

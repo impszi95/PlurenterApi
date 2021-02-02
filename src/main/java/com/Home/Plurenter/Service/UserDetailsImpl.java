@@ -35,9 +35,11 @@ public class UserDetailsImpl implements UserDetails {
 
     private HashSet<String> matchedMeets;
 
+    private boolean active;
+
     public UserDetailsImpl(
             String id, String username,boolean isTenant, int likes, String password,String description, List<Photo> photos,
-            String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets
+            String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets, boolean active
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -51,6 +53,7 @@ public class UserDetailsImpl implements UserDetails {
         this.actualMeetId = actualMeetId;
         this.previousMeets = previousMeets;
         this.matchedMeets = matchedMeets;
+        this.active = active;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -68,7 +71,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getPhotos(),
                 user.getActualMeetId(),
                 user.getPreviousMeets(),
-                user.getMatchedMeets()
+                user.getMatchedMeets(),
+                user.getActive()
 //                authorities
                 );
     }
@@ -140,4 +144,6 @@ public class UserDetailsImpl implements UserDetails {
     public HashSet<String> getMatchedMeets(){return this.matchedMeets;}
 
     public String getDescription(){return this.description;}
+
+    public boolean getActive(){return this.active;}
 }
