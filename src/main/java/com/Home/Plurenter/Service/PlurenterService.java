@@ -153,7 +153,7 @@ public class PlurenterService {
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
         String actualMeetId = user.getActualMeetId();
 
-        if (user.getActive()){
+        if (!user.getActive()){
             System.out.println("User queried meet while deactivated.");
             return new MeetResponse();
         }
