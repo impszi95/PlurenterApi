@@ -213,7 +213,7 @@ public class UserService {
 
                 ActiveTenant activeTenant = new ActiveTenant(tenant.getId());
                 activeTenantRepo.delete(activeTenant);
-                return true;
+                return false;
             }
         }
         else {
@@ -224,10 +224,15 @@ public class UserService {
 
                 ActiveLandlord activeLandlord = new ActiveLandlord(landlord.getId());
                 activeLandlordRepo.delete(activeLandlord);
-                return true;
+                return false;
             }
         }
         System.out.println("Deactivation issue with"+user.getId());
-        return false;
+        return true;
+    }
+
+    public Object getIsActive() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getActive();
     }
 }

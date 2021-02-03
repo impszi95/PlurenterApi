@@ -5,6 +5,7 @@ package com.Home.Plurenter.Controller;
 import com.Home.Plurenter.Model.Landlord.LandlordInfo;
 import com.Home.Plurenter.Model.Tenant.TenantInfo;
 import com.Home.Plurenter.Repo.UserRepo;
+import com.Home.Plurenter.Security.Payload.Response.JwtResponse;
 import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
 import com.Home.Plurenter.Service.PhotoService;
 import com.Home.Plurenter.Service.UserDetailsImpl;
@@ -31,6 +32,11 @@ public class UserController {
 
     @Autowired
     private PhotoService photoService;
+
+    @GetMapping("/getIsActive")
+    public ResponseEntity<?> getIsActive() {
+        return ResponseEntity.ok(userService.getIsActive());
+    }
 
     @GetMapping("/usersCount")
     public ResponseEntity<Long> CountUsers() {
@@ -73,8 +79,8 @@ public class UserController {
     }
     @PostMapping(value = "/deactivateUser")
     public ResponseEntity<?> deactivateUser() {
-        boolean deactivated = userService.DeactivateUser();
-        return ResponseEntity.ok(deactivated);
+        boolean active = userService.DeactivateUser();
+        return ResponseEntity.ok(active);
     }
 }
 
