@@ -1,8 +1,9 @@
 package com.Home.Plurenter.Controller;
 
 //import com.Home.Tinder.Model.Role;
-import com.Home.Plurenter.Model.*;
 //import com.Home.Tinder.Repo.RoleRepository;
+import com.Home.Plurenter.Model.Landlord.LandlordInfo;
+import com.Home.Plurenter.Model.Tenant.TenantInfo;
 import com.Home.Plurenter.Repo.UserRepo;
 import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
 import com.Home.Plurenter.Service.PhotoService;
@@ -64,6 +65,16 @@ public class UserController {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         LandlordInfo landlordInfo = userService.GetLandlord();
         return ResponseEntity.ok(landlordInfo);
+    }
+    @PostMapping(value = "/activateUser")
+    public ResponseEntity<?> activateUser() {
+        boolean activated = userService.ActivateUser();
+        return ResponseEntity.ok(activated);
+    }
+    @PostMapping(value = "/deactivateUser")
+    public ResponseEntity<?> deactivateUser() {
+        boolean deactivated = userService.DeactivateUser();
+        return ResponseEntity.ok(deactivated);
     }
 }
 

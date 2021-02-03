@@ -1,5 +1,6 @@
-package com.Home.Plurenter.Model;
+package com.Home.Plurenter.Model.Tenant;
 
+import com.Home.Plurenter.Model.MinRentTime;
 import org.springframework.data.annotation.Id;
 
 import javax.validation.constraints.NotBlank;
@@ -9,34 +10,31 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class Landlord{
+public class Tenant{
     @Id
     private String id;
-
-    @NotBlank
-    private String commonId;
 
     @NotBlank
     private String username;
 
     private MinRentTime minRentTime;
 
-    private Rent rent;
+    private String job;
 
-    public Landlord(String username, String commonId){
+    public Tenant(String username, String id){
         this.username = username;
-        this.commonId = commonId;
+        this.id = id;
         this.minRentTime = new MinRentTime();
-        this.rent = new Rent(0,"","");
+        this.job = "";
     }
 
-    public String getCommonId(){
-        return this.commonId;
+    public String getId(){
+        return this.id;
     }
     public MinRentTime getMinRentTime(){return this.minRentTime;}
     public void setMinRentTime(MinRentTime minRentTime) {
         this.minRentTime = minRentTime;
     }
-    public Rent getRent(){return this.rent;}
-    public void setRent(Rent rent){this.rent = rent;}
+    public String getJob(){return this.job;}
+    public void setJob(String job){this.job = job;}
 }

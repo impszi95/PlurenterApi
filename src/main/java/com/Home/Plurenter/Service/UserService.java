@@ -1,15 +1,18 @@
 package com.Home.Plurenter.Service;
 
 import com.Home.Plurenter.Model.*;
-import com.Home.Plurenter.Repo.LandlordRepo;
-import com.Home.Plurenter.Repo.TenantRepo;
-import com.Home.Plurenter.Repo.UserRepo;
+import com.Home.Plurenter.Model.Landlord.ActiveLandlord;
+import com.Home.Plurenter.Model.Landlord.Landlord;
+import com.Home.Plurenter.Model.Landlord.LandlordInfo;
+import com.Home.Plurenter.Model.Tenant.ActiveTenant;
+import com.Home.Plurenter.Model.Tenant.Tenant;
+import com.Home.Plurenter.Model.Tenant.TenantInfo;
+import com.Home.Plurenter.Repo.*;
 import com.Home.Plurenter.Security.Payload.Request.SignupRequest;
 import com.Home.Plurenter.Security.Payload.Response.Match.LandlordMatchResponse;
 import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
 import com.Home.Plurenter.Security.Payload.Response.Match.TenantMatchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,12 +33,18 @@ public class UserService {
     private LandlordRepo landlordRepo;
 
     @Autowired
+    private ActiveLandlordRepo activeLandlordRepo;
+
+    @Autowired
+    private ActiveTenantRepo activeTenantRepo;
+
+    @Autowired
     private Valider valider;
 
     public void SaveTenantInfos(TenantInfo infos) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
-        Tenant tenant = user.getActive() ? getTenantFromDB(user.getId()) : new Tenant(user.getUsername(),user.getId());
+        Tenant tenant = getTenantFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
         tenant.setMinRentTime(infos.getMinRentTime()); //uniqe prop
@@ -43,7 +52,7 @@ public class UserService {
 
         if (valider.ValidTenantDatas(tenant)){
             if (!user.getActive()){
-                user.setActive(true);
+                user.setCanActivate(true);
             }
             userRepo.save(user);
             tenantRepo.save(tenant);
@@ -52,8 +61,7 @@ public class UserService {
     public void SaveLandlordInfos(LandlordInfo infos) {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
-
-        Landlord landlord = user.getActive() ? getLandlordFromDB(user.getId()) : new Landlord(user.getUsername(),user.getId());
+        Landlord landlord = getLandlordFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
         landlord.setMinRentTime(infos.getMinRentTime()); //unique prop
@@ -61,7 +69,7 @@ public class UserService {
 
         if (valider.ValidLandlordDatas(landlord)) {
             if (!user.getActive()){
-                user.setActive(true);
+                user.setCanActivate(true);
             }
             userRepo.save(user);
             landlordRepo.save(landlord);
@@ -105,19 +113,15 @@ public class UserService {
     public TenantInfo GetTenant(){ //Self
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
-
-        if (!user.getActive()){
-            System.out.println("Tenant is not active yet");
-            return new TenantInfo();
-        }
+        Tenant tenant = getTenantFromDB(user.getId());
 
         boolean validTenant = userDetails.getIsTenant();
-        if (validTenant && user.getActive()) {
-            Tenant tenant = getTenantFromDB(user.getId());
+        if (validTenant) {
             TenantInfo tenantInfo = new TenantInfo();
             tenantInfo.setLikes(user.getLikes());
             tenantInfo.setDescription(user.getDescription());
             tenantInfo.setActive(user.getActive());
+            tenantInfo.setCanActivate(user.getCanActivate());
             tenantInfo.setMinRentTime(tenant.getMinRentTime());
             tenantInfo.setJob(tenant.getJob());
             return tenantInfo;
@@ -128,19 +132,15 @@ public class UserService {
     public LandlordInfo GetLandlord(){ //Self
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
-
-        if (!user.getActive()){
-            System.out.println("Landlord is not active yet");
-            return new LandlordInfo();
-        }
+        Landlord landlord = getLandlordFromDB(user.getId());
 
         boolean validLandlord = !userDetails.getIsTenant();
         if (validLandlord) {
-            Landlord landlord = getLandlordFromDB(user.getId());
             LandlordInfo landlordInfo = new LandlordInfo();
             landlordInfo.setLikes(user.getLikes());
             landlordInfo.setDescription(user.getDescription());
             landlordInfo.setActive(user.getActive());
+            landlordInfo.setCanActivate(user.getCanActivate());
             landlordInfo.setMinRentTime(landlord.getMinRentTime());
             landlordInfo.setRent(landlord.getRent());
             return landlordInfo;
@@ -154,15 +154,80 @@ public class UserService {
         user.setIsTenant(signUpRequest.getType());
         user.setActive(false);
         userRepo.save(user);
+
+        if (user.getIsTenant()){
+            Tenant tenant = new Tenant(user.getUsername(),user.getId());
+            tenantRepo.save(tenant);
+        }
+        else{
+            Landlord landlord = new Landlord(user.getUsername(),user.getId());
+            landlordRepo.save(landlord);
+        }
     }
 
     private User getUserFromDB(String id){
       return userRepo.findById(id).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId:" + id));
     }
     private Tenant getTenantFromDB(String id){
-        return tenantRepo.findByCommonId(id).orElseThrow(() -> new UsernameNotFoundException("Tenant Not Found with userId:" + id));
+        return tenantRepo.findById(id).orElseThrow(() -> new UsernameNotFoundException("Tenant Not Found with userId:" + id));
     }
     private Landlord getLandlordFromDB(String id){
-        return landlordRepo.findByCommonId(id).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with userId:" + id));
+        return landlordRepo.findById(id).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with userId:" + id));
+    }
+    public boolean ActivateUser(){
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = getUserFromDB(userDetails.getId());
+        if (user.getIsTenant()){
+            Tenant tenant = getTenantFromDB(user.getId());
+            if (valider.ValidTenantDatas(tenant)){
+                user.setActive(true);
+                userRepo.save(user);
+
+                ActiveTenant activeTenant = new ActiveTenant(tenant.getId());
+                activeTenantRepo.save(activeTenant);
+                return true;
+            }
+        }
+        else {
+            Landlord landlord = getLandlordFromDB(user.getId());
+            if (valider.ValidLandlordDatas(landlord)){
+                user.setActive(true);
+                userRepo.save(user);
+
+                ActiveLandlord activeLandlord = new ActiveLandlord(landlord.getId());
+                activeLandlordRepo.save(activeLandlord);
+                return true;
+            }
+        }
+        System.out.println("Activation issue with"+user.getId());
+        return false;
+    }
+    public boolean DeactivateUser() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = getUserFromDB(userDetails.getId());
+        if (user.getIsTenant()){
+            Tenant tenant = getTenantFromDB(user.getId());
+            if (valider.ValidTenantDatas(tenant)){
+                user.setActive(false);
+                userRepo.save(user);
+
+                ActiveTenant activeTenant = new ActiveTenant(tenant.getId());
+                activeTenantRepo.delete(activeTenant);
+                return true;
+            }
+        }
+        else {
+            Landlord landlord = getLandlordFromDB(user.getId());
+            if (valider.ValidLandlordDatas(landlord)){
+                user.setActive(false);
+                userRepo.save(user);
+
+                ActiveLandlord activeLandlord = new ActiveLandlord(landlord.getId());
+                activeLandlordRepo.delete(activeLandlord);
+                return true;
+            }
+        }
+        System.out.println("Deactivation issue with"+user.getId());
+        return false;
     }
 }

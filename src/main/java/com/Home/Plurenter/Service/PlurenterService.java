@@ -1,9 +1,10 @@
 package com.Home.Plurenter.Service;
 
 import com.Home.Plurenter.Model.*;
-import com.Home.Plurenter.Repo.LandlordRepo;
-import com.Home.Plurenter.Repo.TenantRepo;
-import com.Home.Plurenter.Repo.UserRepo;
+import com.Home.Plurenter.Model.Landlord.Landlord;
+import com.Home.Plurenter.Model.Tenant.ActiveTenant;
+import com.Home.Plurenter.Model.Tenant.Tenant;
+import com.Home.Plurenter.Repo.*;
 import com.Home.Plurenter.Security.Payload.Response.Meet.LandlordMeetResponse;
 import com.Home.Plurenter.Security.Payload.Response.Meet.MeetResponse;
 import com.Home.Plurenter.Security.Payload.Response.Meet.TenantMeetResponse;
@@ -25,6 +26,10 @@ public class PlurenterService {
     @Autowired
     NotificationService notificationService;
     @Autowired
+    ActiveTenantRepo activeTenantRepo;
+    @Autowired
+    ActiveLandlordRepo activeLandlordRepo;
+    @Autowired
     PhotoService photoService;
 
     private boolean SetNextUser(String userId) { //Return isSucceed
@@ -34,10 +39,10 @@ public class PlurenterService {
         //Tenant or Landlord
         int repo_size = 0;
         if (user.getIsTenant()){
-            repo_size = landlordRepo.findAll().size();
+            repo_size = activeLandlordRepo.findAll().size();
         }
         else{
-            repo_size = tenantRepo.findAll().size();
+            repo_size = activeTenantRepo.findAll().size();
         }
         //Without confitions //All visited
 //        if (repo_size == user.getPreviousMeets().size())
@@ -50,10 +55,10 @@ public class PlurenterService {
         boolean foundMeet = false;
         if (!user.getIsTenant()) {
             for (int i=0;i<repo_size;i++){  //Try N random
-                rndUserId = tenantRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+                rndUserId = activeTenantRepo.findAll().get(rand.nextInt(repo_size)).getId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
-                    Tenant probMeet = tenantRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                    Tenant probMeet = tenantRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                     boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
                     if (tenantFitsConditions){
                         i=repo_size;
@@ -63,10 +68,10 @@ public class PlurenterService {
             }
             if (!foundMeet){
                 for (int i = 0;i<repo_size;i++){    //If no random, Go through sequential
-                    rndUserId = tenantRepo.findAll().get(i).getCommonId();
+                    rndUserId = activeTenantRepo.findAll().get(i).getId();
                     boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                     if (haventMet){
-                        Tenant probMeet = tenantRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                        Tenant probMeet = tenantRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                         boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
                         if (tenantFitsConditions){
                             i=repo_size;
@@ -82,10 +87,10 @@ public class PlurenterService {
         }
         else{
             for (int i=0;i<repo_size;i++){
-                rndUserId = landlordRepo.findAll().get(rand.nextInt(repo_size)).getCommonId();
+                rndUserId = activeLandlordRepo.findAll().get(rand.nextInt(repo_size)).getId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
-                    Landlord probMeet = landlordRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                    Landlord probMeet = landlordRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                     boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
                     if (landlordFitsConditions){
                         i=repo_size;
@@ -95,10 +100,10 @@ public class PlurenterService {
             }
             if (!foundMeet){
                 for (int i = 0;i<repo_size;i++){    //If no random, Go through sequential
-                    rndUserId = landlordRepo.findAll().get(i).getCommonId();
+                    rndUserId = activeLandlordRepo.findAll().get(i).getId();
                     boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                     if (haventMet){
-                        Landlord probMeet = landlordRepo.findByCommonId(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
+                        Landlord probMeet = landlordRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
                         boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
                         if (landlordFitsConditions){
                             i=repo_size;
@@ -127,14 +132,14 @@ public class PlurenterService {
     }
 
     private boolean CheckConditionsForLandlord(User user, Landlord probMeet) {
-        Tenant tenant = tenantRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
+        Tenant tenant = tenantRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
         if (probMeet.getMinRentTime().isLessOrEqualsThan(tenant.getMinRentTime())){
             return true;
         }
         return false;
     }
     private boolean CheckConditionsForTenant(User user, Tenant probMeet) {
-        Landlord landlord = landlordRepo.findByCommonId(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
+        Landlord landlord = landlordRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
         if (probMeet.getMinRentTime().isMoreOrEqualsThan(landlord.getMinRentTime())){
             return true;
         }
@@ -147,6 +152,11 @@ public class PlurenterService {
 
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + userId));
         String actualMeetId = user.getActualMeetId();
+
+        if (user.getActive()){
+            System.out.println("User queried meet while deactivated.");
+            return new MeetResponse();
+        }
 
         //First/Empty login
         if(actualMeetId.equals("")){
@@ -170,7 +180,7 @@ public class PlurenterService {
             landlordMeetResponse.setPhotos(actualMeet.getPhotos());
             landlordMeetResponse.setDescription(actualMeet.getDescription());
 
-            Landlord landlord = landlordRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
+            Landlord landlord = landlordRepo.findById(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
             landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
             landlordMeetResponse.setRent(landlord.getRent().toString());
             return landlordMeetResponse;
@@ -183,7 +193,7 @@ public class PlurenterService {
             tenantMeetResponse.setPhotos(actualMeet.getPhotos());
             tenantMeetResponse.setDescription(actualMeet.getDescription());
 
-            Tenant tenant = tenantRepo.findByCommonId(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
+            Tenant tenant = tenantRepo.findById(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
             tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
             tenantMeetResponse.setJob(tenant.getJob());
             return tenantMeetResponse;
@@ -276,7 +286,7 @@ public class PlurenterService {
                 landlordMeetResponse.setPhotos(matchedMeet.getPhotos());
                 landlordMeetResponse.setDescription(matchedMeet.getDescription());
 
-                Landlord landlord = landlordRepo.findByCommonId(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
+                Landlord landlord = landlordRepo.findById(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
                 landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
                 matchedMeetsRes.add(landlordMeetResponse);
             }
@@ -287,7 +297,7 @@ public class PlurenterService {
                 tenantMeetResponse.setPhotos(matchedMeet.getPhotos());
                 tenantMeetResponse.setDescription(matchedMeet.getDescription());
 
-                Tenant tenant = tenantRepo.findByCommonId(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
+                Tenant tenant = tenantRepo.findById(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
                 tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
                 matchedMeetsRes.add(tenantMeetResponse);
             }else {

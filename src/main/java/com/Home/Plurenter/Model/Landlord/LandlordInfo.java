@@ -1,16 +1,19 @@
-package com.Home.Plurenter.Model;
+package com.Home.Plurenter.Model.Landlord;
 
+import com.Home.Plurenter.Model.MinRentTime;
+import com.Home.Plurenter.Model.Rent;
 import lombok.Data;
 
 @Data
-public class TenantInfo {
+public class LandlordInfo {
     private int likes;
     private MinRentTime minRentTime;
     private boolean active;
     private String description;
-    private String job;
+    private Rent rent;
+    private boolean canActivate;
 
-    public TenantInfo(){
+    public LandlordInfo(){
         this.likes = 0;
         this.minRentTime = new MinRentTime();
         this.minRentTime.setYear(0);
@@ -18,6 +21,7 @@ public class TenantInfo {
         this.minRentTime.setDay(0);
         this.active = false;
         this.description = "";
-        this.job = "";
+        this.rent = new Rent(0,"","");
+        this.canActivate = false;
     }
 }

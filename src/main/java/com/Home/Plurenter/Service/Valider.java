@@ -1,9 +1,9 @@
 package com.Home.Plurenter.Service;
 
-import com.Home.Plurenter.Model.Landlord;
+import com.Home.Plurenter.Model.Landlord.Landlord;
 import com.Home.Plurenter.Model.MinRentTime;
 import com.Home.Plurenter.Model.Rent;
-import com.Home.Plurenter.Model.Tenant;
+import com.Home.Plurenter.Model.Tenant.Tenant;
 import org.springframework.stereotype.Service;
 
 @Service

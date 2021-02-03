@@ -37,9 +37,11 @@ public class UserDetailsImpl implements UserDetails {
 
     private boolean active;
 
+    private boolean canActivate;
+
     public UserDetailsImpl(
             String id, String username,boolean isTenant, int likes, String password,String description, List<Photo> photos,
-            String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets, boolean active
+            String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets, boolean active, boolean canActivate
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
@@ -54,6 +56,7 @@ public class UserDetailsImpl implements UserDetails {
         this.previousMeets = previousMeets;
         this.matchedMeets = matchedMeets;
         this.active = active;
+        this.canActivate = canActivate;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -72,7 +75,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getActualMeetId(),
                 user.getPreviousMeets(),
                 user.getMatchedMeets(),
-                user.getActive()
+                user.getActive(),
+                user.getCanActivate()
 //                authorities
                 );
     }
@@ -146,4 +150,6 @@ public class UserDetailsImpl implements UserDetails {
     public String getDescription(){return this.description;}
 
     public boolean getActive(){return this.active;}
+
+    public boolean canActivate(){return this.canActivate;}
 }
