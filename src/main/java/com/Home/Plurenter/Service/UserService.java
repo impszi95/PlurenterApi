@@ -79,7 +79,7 @@ public class UserService {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         boolean validMatch = userDetails.getMatchedMeets().contains(matchId);
         if (validMatch){
-            User matchedUser = getUserFromDB(userDetails.getId());
+            User matchedUser = getUserFromDB(matchId);
             if (userDetails.getIsTenant() && !matchedUser.getIsTenant()){//Match is a valid landlord
                 Landlord landlord = getLandlordFromDB(matchedUser.getId());
                 LandlordMatchResponse landlordMatchResponse = new LandlordMatchResponse();
