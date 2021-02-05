@@ -15,15 +15,11 @@ public class Landlord{
     @Id
     private String id;
 
-    @NotBlank
-    private String username;
-
     private MinRentTime minRentTime;
 
     private Rent rent;
 
-    public Landlord(String username, String id){
-        this.username = username;
+    public Landlord(String id){
         this.id = id;
         this.minRentTime = new MinRentTime();
         this.rent = new Rent(0,"","");

@@ -46,7 +46,7 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
@@ -58,7 +58,8 @@ public class AuthController {
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getId(),
-                userDetails.getUsername(),
+                userDetails.getEmail(),
+                userDetails.getName(),
                 userDetails.getIsTenant()
 //                roles
         ));
@@ -72,10 +73,10 @@ public class AuthController {
                     .body(new MessageResponse("Error: Sign up is not valid"));
         }
 
-        if (userRepo.existsByUsername(signUpRequest.getUsername())) {
+        if (userRepo.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity
                     .badRequest()
-                    .body(new MessageResponse("Error: Username is already taken!"));
+                    .body(new MessageResponse("Error: Email is already taken!"));
         }
 
         userService.CreateNewUser(signUpRequest);

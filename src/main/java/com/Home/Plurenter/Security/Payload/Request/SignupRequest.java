@@ -10,9 +10,10 @@ import java.util.Set;
 @Data
 public class SignupRequest {
     @NotBlank
-    private String username;
+    private String email;
 
-//    private Set<String> roles;
+    @NotBlank
+    private String name;
 
     @NotBlank
     @Size(min = 8)

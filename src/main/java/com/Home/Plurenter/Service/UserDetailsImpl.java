@@ -14,7 +14,9 @@ public class UserDetailsImpl implements UserDetails {
 
     private String id;
 
-    private String username;
+    private String email;
+
+    private String name;
 
     @JsonIgnore
     private String password;
@@ -40,13 +42,14 @@ public class UserDetailsImpl implements UserDetails {
     private boolean canActivate;
 
     public UserDetailsImpl(
-            String id, String username,boolean isTenant, int likes, String password,String description, List<Photo> photos,
+            String id, String email, String name, boolean isTenant, int likes, String password, String description, List<Photo> photos,
             String actualMeetId, HashSet<String> previousMeets, HashSet<String> matchedMeets, boolean active, boolean canActivate
 //            ,Collection<? extends GrantedAuthority> authorities
     ) {
         this.id = id;
-        this.username = username;
+        this.email = email;
         this.password = password;
+        this.name = name;
         this.isTenant = isTenant;
         this.description = description;
 //        this.authorities = authorities;
@@ -66,7 +69,8 @@ public class UserDetailsImpl implements UserDetails {
 
         return new UserDetailsImpl(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
+                user.getName(),
                 user.getIsTenant(),
                 user.getLikes(),
                 user.getPassword(),
@@ -106,8 +110,13 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return this.email;
     }
+    public String getEmail(){
+        return this.email;
+    }
+
+    public String getName(){return this.name;}
 
     @Override
     public boolean isAccountNonExpired() {

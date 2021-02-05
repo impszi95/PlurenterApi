@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class TenantInfo {
+    private String name;
     private int likes;
     private MinRentTime minRentTime;
     private boolean active;
@@ -13,6 +14,7 @@ public class TenantInfo {
     private boolean canActivate;
 
     public TenantInfo(){
+        this.name="";
         this.likes = 0;
         this.minRentTime = new MinRentTime();
         this.minRentTime.setYear(0);

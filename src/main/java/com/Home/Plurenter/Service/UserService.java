@@ -47,10 +47,11 @@ public class UserService {
         Tenant tenant = getTenantFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
+        user.setName(infos.getName());
         tenant.setMinRentTime(infos.getMinRentTime()); //uniqe prop
         tenant.setJob(infos.getJob());
 
-        if (valider.ValidTenantDatas(tenant)){
+        if (valider.ValidUserDatas(user) && valider.ValidTenantDatas(tenant)){
             if (!user.getActive()){
                 user.setCanActivate(true);
             }
@@ -64,10 +65,11 @@ public class UserService {
         Landlord landlord = getLandlordFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
+        user.setName(infos.getName());
         landlord.setMinRentTime(infos.getMinRentTime()); //unique prop
         landlord.setRent(infos.getRent());
 
-        if (valider.ValidLandlordDatas(landlord)) {
+        if (valider.ValidUserDatas(user) && valider.ValidLandlordDatas(landlord)) {
             if (!user.getActive()){
                 user.setCanActivate(true);
             }
@@ -83,7 +85,7 @@ public class UserService {
             if (userDetails.getIsTenant() && !matchedUser.getIsTenant()){//Match is a valid landlord
                 Landlord landlord = getLandlordFromDB(matchedUser.getId());
                 LandlordMatchResponse landlordMatchResponse = new LandlordMatchResponse();
-                landlordMatchResponse.setUsername(matchedUser.getUsername());
+                landlordMatchResponse.setName(matchedUser.getName());
                 landlordMatchResponse.setDescription(matchedUser.getDescription());
                 landlordMatchResponse.setPhotos(matchedUser.getPhotos());
                 landlordMatchResponse.setTenant(matchedUser.getIsTenant());
@@ -95,7 +97,7 @@ public class UserService {
             if (!userDetails.getIsTenant() && matchedUser.getIsTenant()) { //Match is a valid tenant
                 Tenant tenant = getTenantFromDB(matchedUser.getId());
                 TenantMatchResponse tenantMatchResponse = new TenantMatchResponse();
-                tenantMatchResponse.setUsername(matchedUser.getUsername());
+                tenantMatchResponse.setName(matchedUser.getName());
                 tenantMatchResponse.setDescription(matchedUser.getDescription());
                 tenantMatchResponse.setPhotos(matchedUser.getPhotos());
                 tenantMatchResponse.setTenant(matchedUser.getIsTenant());
@@ -118,6 +120,7 @@ public class UserService {
         boolean validTenant = userDetails.getIsTenant();
         if (validTenant) {
             TenantInfo tenantInfo = new TenantInfo();
+            tenantInfo.setName(user.getName());
             tenantInfo.setLikes(user.getLikes());
             tenantInfo.setDescription(user.getDescription());
             tenantInfo.setActive(user.getActive());
@@ -137,6 +140,7 @@ public class UserService {
         boolean validLandlord = !userDetails.getIsTenant();
         if (validLandlord) {
             LandlordInfo landlordInfo = new LandlordInfo();
+            landlordInfo.setName(user.getName());
             landlordInfo.setLikes(user.getLikes());
             landlordInfo.setDescription(user.getDescription());
             landlordInfo.setActive(user.getActive());
@@ -149,18 +153,18 @@ public class UserService {
         return new LandlordInfo();
     }
     public void CreateNewUser(SignupRequest signUpRequest){
-        User user = new User(signUpRequest.getUsername(),
+        User user = new User(signUpRequest.getName(),signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
         user.setIsTenant(signUpRequest.getType());
         user.setActive(false);
         userRepo.save(user);
 
         if (user.getIsTenant()){
-            Tenant tenant = new Tenant(user.getUsername(),user.getId());
+            Tenant tenant = new Tenant(user.getId());
             tenantRepo.save(tenant);
         }
         else{
-            Landlord landlord = new Landlord(user.getUsername(),user.getId());
+            Landlord landlord = new Landlord(user.getId());
             landlordRepo.save(landlord);
         }
     }
@@ -177,6 +181,11 @@ public class UserService {
     public boolean ActivateUser(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
+
+        if (!valider.ValidUserDatas(user)){
+            return false;
+        }
+
         if (user.getIsTenant()){
             Tenant tenant = getTenantFromDB(user.getId());
             if (valider.ValidTenantDatas(tenant)){
@@ -205,6 +214,11 @@ public class UserService {
     public boolean DeactivateUser() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = getUserFromDB(userDetails.getId());
+
+        if (!valider.ValidUserDatas(user)){
+            return false;
+        }
+
         if (user.getIsTenant()){
             Tenant tenant = getTenantFromDB(user.getId());
             if (valider.ValidTenantDatas(tenant)){

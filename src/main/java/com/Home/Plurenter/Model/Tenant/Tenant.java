@@ -14,15 +14,11 @@ public class Tenant{
     @Id
     private String id;
 
-    @NotBlank
-    private String username;
-
     private MinRentTime minRentTime;
 
     private String job;
 
-    public Tenant(String username, String id){
-        this.username = username;
+    public Tenant(String id){
         this.id = id;
         this.minRentTime = new MinRentTime();
         this.job = "";

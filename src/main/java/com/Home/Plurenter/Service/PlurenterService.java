@@ -2,7 +2,6 @@ package com.Home.Plurenter.Service;
 
 import com.Home.Plurenter.Model.*;
 import com.Home.Plurenter.Model.Landlord.Landlord;
-import com.Home.Plurenter.Model.Tenant.ActiveTenant;
 import com.Home.Plurenter.Model.Tenant.Tenant;
 import com.Home.Plurenter.Repo.*;
 import com.Home.Plurenter.Security.Payload.Response.Meet.LandlordMeetResponse;
@@ -175,7 +174,7 @@ public class PlurenterService {
         if (user.getIsTenant() && !actualMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
             LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
             landlordMeetResponse.setId(actualMeet.getId());
-            landlordMeetResponse.setUsername(actualMeet.getUsername());
+            landlordMeetResponse.setName(actualMeet.getName());
             landlordMeetResponse.setTenant(actualMeet.getIsTenant());
             landlordMeetResponse.setPhotos(actualMeet.getPhotos());
             landlordMeetResponse.setDescription(actualMeet.getDescription());
@@ -188,7 +187,7 @@ public class PlurenterService {
         if (!user.getIsTenant() && actualMeet.getIsTenant()){
             TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
             tenantMeetResponse.setId(actualMeet.getId());
-            tenantMeetResponse.setUsername(actualMeet.getUsername());
+            tenantMeetResponse.setName(actualMeet.getName());
             tenantMeetResponse.setTenant(actualMeet.getIsTenant());
             tenantMeetResponse.setPhotos(actualMeet.getPhotos());
             tenantMeetResponse.setDescription(actualMeet.getDescription());
@@ -251,12 +250,12 @@ public class PlurenterService {
         Notification notification = new Notification();
 
         notification.setUserIdX(userX.getId());
-        notification.setUsernameX(userX.getUsername());
+        notification.setNameX(userX.getName());
         byte[] thumbnailX = photoService.getThumbnailForUser(userX.getId());
         notification.setThumbnailX(thumbnailX);
 
         notification.setUserIdY(userY.getId());
-        notification.setUsernameY(userY.getUsername());
+        notification.setNameY(userY.getName());
         byte[] thumbnailY = photoService.getThumbnailForUser(userY.getId());
         notification.setThumbnailY(thumbnailY);
 
@@ -282,7 +281,7 @@ public class PlurenterService {
             if (userX.getIsTenant() && !matchedMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
                 LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
                 landlordMeetResponse.setId(matchedMeet.getId());
-                landlordMeetResponse.setUsername(matchedMeet.getUsername());
+                landlordMeetResponse.setName(matchedMeet.getName());
                 landlordMeetResponse.setPhotos(matchedMeet.getPhotos());
                 landlordMeetResponse.setDescription(matchedMeet.getDescription());
 
@@ -293,7 +292,7 @@ public class PlurenterService {
             else if (!userX.getIsTenant() && matchedMeet.getIsTenant()){
                 TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
                 tenantMeetResponse.setId(matchedMeet.getId());
-                tenantMeetResponse.setUsername(matchedMeet.getUsername());
+                tenantMeetResponse.setName(matchedMeet.getName());
                 tenantMeetResponse.setPhotos(matchedMeet.getPhotos());
                 tenantMeetResponse.setDescription(matchedMeet.getDescription());
 
@@ -301,7 +300,7 @@ public class PlurenterService {
                 tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
                 matchedMeetsRes.add(tenantMeetResponse);
             }else {
-                System.out.println("Queried meet and user is in the same role." + userX.getUsername() +", "+matchedMeet.getUsername());
+                System.out.println("Queried meet and user is in the same role." + userX.getEmail() +", "+matchedMeet.getEmail());
             }
         }
         return matchedMeetsRes;

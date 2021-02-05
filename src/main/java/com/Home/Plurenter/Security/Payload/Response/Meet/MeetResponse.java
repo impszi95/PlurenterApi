@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 public class MeetResponse {
         private String id;
-        private String username;
+        private String name;
         private boolean isTenant;
         private List<Photo> photos;
         private String minRentTime;

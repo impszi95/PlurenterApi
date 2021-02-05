@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class MatchResponse {
-    private String username;
+    private String name;
     private String description;
     private List<Photo> photos;
     private boolean isTenant;
