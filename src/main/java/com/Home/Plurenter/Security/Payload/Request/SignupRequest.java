@@ -10,14 +10,16 @@ import java.util.Set;
 @Data
 public class SignupRequest {
     @NotBlank
-    @Size(min = 3, max = 20)
     private String username;
 
 //    private Set<String> roles;
 
     @NotBlank
-    @Size(min = 6, max = 40)
+    @Size(min = 8)
     private String password;
 
+    @NotBlank
     private String type;
+    @NotBlank
+    private boolean terms;
 }

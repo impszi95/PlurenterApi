@@ -4,6 +4,7 @@ import com.Home.Plurenter.Model.Landlord.Landlord;
 import com.Home.Plurenter.Model.MinRentTime;
 import com.Home.Plurenter.Model.Rent;
 import com.Home.Plurenter.Model.Tenant.Tenant;
+import com.Home.Plurenter.Security.Payload.Request.SignupRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,18 @@ public class Valider {
             return false;
         }
         if (rent.getAmount()<0){
+            return false;
+        }
+        return true;
+    }
+    public boolean ValidSignUp(SignupRequest signupRequest){
+        if (signupRequest.getUsername() == null ||
+            signupRequest.getPassword() == null ||
+                signupRequest.getType() == null ||
+                signupRequest.getPassword().length()<8 ||
+                (!signupRequest.getType().equals("tenant") && !signupRequest.getType().equals("landlord"))||
+                !signupRequest.isTerms()
+        ){
             return false;
         }
         return true;

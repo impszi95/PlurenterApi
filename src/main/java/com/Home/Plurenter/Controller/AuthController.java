@@ -13,6 +13,7 @@ import com.Home.Plurenter.Security.Payload.Response.JwtResponse;
 import com.Home.Plurenter.Security.Payload.Response.MessageResponse;
 import com.Home.Plurenter.Security.jwt.JwtUtils;
 import com.Home.Plurenter.Service.UserService;
+import com.Home.Plurenter.Service.Valider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,11 +41,10 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
-
+    @Autowired
+    Valider valider;
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
-
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -66,6 +66,12 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        if (!valider.ValidSignUp(signUpRequest)){
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Sign up is not valid"));
+        }
+
         if (userRepo.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
