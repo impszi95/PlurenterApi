@@ -28,8 +28,6 @@ public class PlurenterService {
     ActiveTenantRepo activeTenantRepo;
     @Autowired
     ActiveLandlordRepo activeLandlordRepo;
-    @Autowired
-    PhotoService photoService;
 
     private boolean SetNextUser(String userId) { //Return isSucceed
         Random rand = new Random();
@@ -129,7 +127,6 @@ public class PlurenterService {
         userRepo.save(user);
         return true;
     }
-
     private boolean CheckConditionsForLandlord(User user, Landlord probMeet) {
         Tenant tenant = tenantRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
         if (probMeet.getMinRentTime().isLessOrEqualsThan(tenant.getMinRentTime())){
@@ -144,7 +141,6 @@ public class PlurenterService {
         }
         return false;
     }
-
     public MeetResponse GetActualMeet(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = userDetails.getId();
@@ -200,7 +196,6 @@ public class PlurenterService {
         System.out.println("Queried meet and user is in the same role.");
         return new MeetResponse();
     }
-
     public void XMetY(String idX, String idY){
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
         userX.addPreviousMeets(idY);
@@ -208,7 +203,6 @@ public class PlurenterService {
 
         SetNextUser(idX);
     }
-
     public void UserLikesActualMeet(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idX = userDetails.getId();
@@ -218,25 +212,21 @@ public class PlurenterService {
         HandleLike(idX, idY);
         IncementLikes(idY);
     }
-
     private void HandleLike(String idX, String idY) {
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
         User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
 
         boolean matched = userX.getReceivedLikesMeets().contains(idY);
         if (matched){
-            Notification newNotification = createNotification(userX,userY);
-            try {
-                notificationService.NewMatchNotification(newNotification);
-            }catch (Exception e){
-                System.out.println("Notification service down.");
-            }
-
             userX.addMatchedMeet(idY);
             userX.removeReceivedMeet(idY);
+            IncrementMatches(userX);
 
             userY.addMatchedMeet(idX);
             userY.removeLikedMeet(idX);
+            IncrementMatches(userY);
+
+            SendNotification(userX,userY);
         }
         else {
             userX.addLikedMeet(idY);
@@ -245,30 +235,24 @@ public class PlurenterService {
         userRepo.save(userX);
         userRepo.save(userY);
     }
-
-    private Notification createNotification(User userX, User userY){
-        Notification notification = new Notification();
-
-        notification.setUserIdX(userX.getId());
-        notification.setNameX(userX.getName());
-        byte[] thumbnailX = photoService.getThumbnailForUser(userX.getId());
-        notification.setThumbnailX(thumbnailX);
-
-        notification.setUserIdY(userY.getId());
-        notification.setNameY(userY.getName());
-        byte[] thumbnailY = photoService.getThumbnailForUser(userY.getId());
-        notification.setThumbnailY(thumbnailY);
-
-        return notification;
+    private void SendNotification(User userX, User userY) {
+        Notification newNotification = notificationService.createNotification(userX,userY);
+        try {
+            notificationService.NewMatchNotification(newNotification);
+        }catch (Exception e){
+            System.out.println("Notification service down.");
+        }
     }
-
     public void IncementLikes(String idY){
         User userY = userRepo.findById(idY).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idY));
         int prev_likes = userY.getLikes();
         userY.setLikes(prev_likes+1);
         userRepo.save(userY);
     }
-
+    public void IncrementMatches(User user){
+        int prev_matches = user.getMatches();
+        user.setMatches(prev_matches+1);
+    }
     public List<MeetResponse> GetAllMatchedMeets(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idX = userDetails.getId();
@@ -305,7 +289,6 @@ public class PlurenterService {
         }
         return matchedMeetsRes;
     }
-
     public void UserDislikesActualMeet() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idX = userDetails.getId();

@@ -22,22 +22,16 @@ import org.springframework.stereotype.Service;
 public class UserService {
     @Autowired
     PasswordEncoder encoder;
-
     @Autowired
     private UserRepo userRepo;
-
     @Autowired
     private TenantRepo tenantRepo;
-
     @Autowired
     private LandlordRepo landlordRepo;
-
     @Autowired
     private ActiveLandlordRepo activeLandlordRepo;
-
     @Autowired
     private ActiveTenantRepo activeTenantRepo;
-
     @Autowired
     private Valider valider;
 
@@ -122,6 +116,7 @@ public class UserService {
             TenantInfo tenantInfo = new TenantInfo();
             tenantInfo.setName(user.getName());
             tenantInfo.setLikes(user.getLikes());
+            tenantInfo.setMatches(user.getMatches());
             tenantInfo.setDescription(user.getDescription());
             tenantInfo.setActive(user.getActive());
             tenantInfo.setCanActivate(user.getCanActivate());
@@ -142,6 +137,7 @@ public class UserService {
             LandlordInfo landlordInfo = new LandlordInfo();
             landlordInfo.setName(user.getName());
             landlordInfo.setLikes(user.getLikes());
+            landlordInfo.setMatches(user.getMatches());
             landlordInfo.setDescription(user.getDescription());
             landlordInfo.setActive(user.getActive());
             landlordInfo.setCanActivate(user.getCanActivate());
@@ -168,7 +164,6 @@ public class UserService {
             landlordRepo.save(landlord);
         }
     }
-
     private User getUserFromDB(String id){
       return userRepo.findById(id).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId:" + id));
     }
@@ -244,7 +239,6 @@ public class UserService {
         System.out.println("Deactivation issue with"+user.getId());
         return true;
     }
-
     public Object getIsActive() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userDetails.getActive();
