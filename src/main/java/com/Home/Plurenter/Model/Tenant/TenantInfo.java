@@ -1,7 +1,10 @@
 package com.Home.Plurenter.Model.Tenant;
 
+import com.Home.Plurenter.Model.Location;
 import com.Home.Plurenter.Model.MinRentTime;
 import lombok.Data;
+
+import java.util.Locale;
 
 @Data
 public class TenantInfo {
@@ -11,8 +14,10 @@ public class TenantInfo {
     private MinRentTime minRentTime;
     private boolean active;
     private String description;
+    private String phone;
     private String job;
     private boolean canActivate;
+    private Location location;
 
     public TenantInfo(){
         this.name="";
@@ -24,7 +29,9 @@ public class TenantInfo {
         this.minRentTime.setDay(0);
         this.active = false;
         this.description = "";
+        this.phone = "";
         this.job = "";
         this.canActivate = false;
+        this.location = new Location("","","",  -1,-1,-1);
     }
 }

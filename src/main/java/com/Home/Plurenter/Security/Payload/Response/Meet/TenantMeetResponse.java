@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class TenantMeetResponse extends MeetResponse {
+    private String name;
     private String job;
 }

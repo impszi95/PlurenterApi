@@ -4,6 +4,10 @@ import com.Home.Plurenter.Model.*;
 import com.Home.Plurenter.Model.Landlord.Landlord;
 import com.Home.Plurenter.Model.Tenant.Tenant;
 import com.Home.Plurenter.Repo.*;
+import com.Home.Plurenter.Security.Payload.Response.Match.LandlordMatchResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchThumbnail;
+import com.Home.Plurenter.Security.Payload.Response.Match.TenantMatchResponse;
 import com.Home.Plurenter.Security.Payload.Response.Meet.LandlordMeetResponse;
 import com.Home.Plurenter.Security.Payload.Response.Meet.MeetResponse;
 import com.Home.Plurenter.Security.Payload.Response.Meet.TenantMeetResponse;
@@ -167,13 +171,13 @@ public class PlurenterService {
         String finalActualMeetId = actualMeetId;
         User actualMeet = userRepo.findById(actualMeetId) .orElseThrow(() -> new UsernameNotFoundException("actualMeet Not Found with userId: "+ finalActualMeetId));
 
-        if (user.getIsTenant() && !actualMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
+        if (user.getIsTenant() && !actualMeet.getIsTenant()){
             LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
             landlordMeetResponse.setId(actualMeet.getId());
-            landlordMeetResponse.setName(actualMeet.getName());
             landlordMeetResponse.setTenant(actualMeet.getIsTenant());
             landlordMeetResponse.setPhotos(actualMeet.getPhotos());
             landlordMeetResponse.setDescription(actualMeet.getDescription());
+            landlordMeetResponse.setLocation(actualMeet.getLocation());
 
             Landlord landlord = landlordRepo.findById(actualMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + actualMeet.getId()));
             landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
@@ -253,41 +257,30 @@ public class PlurenterService {
         int prev_matches = user.getMatches();
         user.setMatches(prev_matches+1);
     }
-    public List<MeetResponse> GetAllMatchedMeets(){
+    public List<MatchThumbnail> GetAllMatchedMeets(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String idX = userDetails.getId();
 
-        List<MeetResponse> matchedMeetsRes = new ArrayList<>();
+        List<MatchThumbnail> matches = new ArrayList<>();
         User userX = userRepo.findById(idX).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
 
         for (String matchedMeetId : userX.getMatchedMeets()){
             User matchedMeet = userRepo.findById(matchedMeetId).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + idX));
-            if (userX.getIsTenant() && !matchedMeet.getIsTenant()){ // TODO: Make a Validator and/or Factory from this
-                LandlordMeetResponse landlordMeetResponse = new LandlordMeetResponse();
-                landlordMeetResponse.setId(matchedMeet.getId());
-                landlordMeetResponse.setName(matchedMeet.getName());
-                landlordMeetResponse.setPhotos(matchedMeet.getPhotos());
-                landlordMeetResponse.setDescription(matchedMeet.getDescription());
+            MatchThumbnail matchThumbnail = new MatchThumbnail();
+            matchThumbnail.setId(matchedMeet.getId());
+            matchThumbnail.setThumbnail(matchedMeet.getPhotos().isEmpty() ? null : matchedMeet.getPhotos().get(0));
 
-                Landlord landlord = landlordRepo.findById(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
-                landlordMeetResponse.setMinRentTime(landlord.getMinRentTime().toString());
-                matchedMeetsRes.add(landlordMeetResponse);
+            if (userX.getIsTenant() && !matchedMeet.getIsTenant()){
+                matchThumbnail.setDisplayName(matchedMeet.getLocation().getCity());
             }
             else if (!userX.getIsTenant() && matchedMeet.getIsTenant()){
-                TenantMeetResponse tenantMeetResponse = new TenantMeetResponse();
-                tenantMeetResponse.setId(matchedMeet.getId());
-                tenantMeetResponse.setName(matchedMeet.getName());
-                tenantMeetResponse.setPhotos(matchedMeet.getPhotos());
-                tenantMeetResponse.setDescription(matchedMeet.getDescription());
-
-                Tenant tenant = tenantRepo.findById(matchedMeet.getId()).orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: " + matchedMeet.getId()));
-                tenantMeetResponse.setMinRentTime(tenant.getMinRentTime().toString());
-                matchedMeetsRes.add(tenantMeetResponse);
+                matchThumbnail.setDisplayName(matchedMeet.getName());
             }else {
                 System.out.println("Queried meet and user is in the same role." + userX.getEmail() +", "+matchedMeet.getEmail());
             }
+            matches.add(matchThumbnail);
         }
-        return matchedMeetsRes;
+        return matches;
     }
     public void UserDislikesActualMeet() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

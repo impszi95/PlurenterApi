@@ -41,7 +41,9 @@ public class UserService {
         Tenant tenant = getTenantFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
+        user.setPhone(infos.getPhone());
         user.setName(infos.getName());
+        user.setLocation(infos.getLocation());
         tenant.setMinRentTime(infos.getMinRentTime()); //uniqe prop
         tenant.setJob(infos.getJob());
 
@@ -59,7 +61,9 @@ public class UserService {
         Landlord landlord = getLandlordFromDB(user.getId());
 
         user.setDescription(infos.getDescription()); //common prop
+        user.setPhone(infos.getPhone());
         user.setName(infos.getName());
+        user.setLocation(infos.getLocation());
         landlord.setMinRentTime(infos.getMinRentTime()); //unique prop
         landlord.setRent(infos.getRent());
 
@@ -80,7 +84,10 @@ public class UserService {
                 Landlord landlord = getLandlordFromDB(matchedUser.getId());
                 LandlordMatchResponse landlordMatchResponse = new LandlordMatchResponse();
                 landlordMatchResponse.setName(matchedUser.getName());
+                landlordMatchResponse.setEmail(matchedUser.getEmail());
                 landlordMatchResponse.setDescription(matchedUser.getDescription());
+                landlordMatchResponse.setPhone(matchedUser.getPhone());
+                landlordMatchResponse.setLocation(matchedUser.getLocation());
                 landlordMatchResponse.setPhotos(matchedUser.getPhotos());
                 landlordMatchResponse.setTenant(matchedUser.getIsTenant());
 
@@ -92,7 +99,9 @@ public class UserService {
                 Tenant tenant = getTenantFromDB(matchedUser.getId());
                 TenantMatchResponse tenantMatchResponse = new TenantMatchResponse();
                 tenantMatchResponse.setName(matchedUser.getName());
+                tenantMatchResponse.setEmail(matchedUser.getEmail());
                 tenantMatchResponse.setDescription(matchedUser.getDescription());
+                tenantMatchResponse.setPhone(matchedUser.getPhone());
                 tenantMatchResponse.setPhotos(matchedUser.getPhotos());
                 tenantMatchResponse.setTenant(matchedUser.getIsTenant());
 
@@ -118,8 +127,10 @@ public class UserService {
             tenantInfo.setLikes(user.getLikes());
             tenantInfo.setMatches(user.getMatches());
             tenantInfo.setDescription(user.getDescription());
+            tenantInfo.setPhone(user.getPhone());
             tenantInfo.setActive(user.getActive());
             tenantInfo.setCanActivate(user.getCanActivate());
+            tenantInfo.setLocation(user.getLocation());
             tenantInfo.setMinRentTime(tenant.getMinRentTime());
             tenantInfo.setJob(tenant.getJob());
             return tenantInfo;
@@ -139,8 +150,10 @@ public class UserService {
             landlordInfo.setLikes(user.getLikes());
             landlordInfo.setMatches(user.getMatches());
             landlordInfo.setDescription(user.getDescription());
+            landlordInfo.setPhone(user.getPhone());
             landlordInfo.setActive(user.getActive());
             landlordInfo.setCanActivate(user.getCanActivate());
+            landlordInfo.setLocation(user.getLocation());
             landlordInfo.setMinRentTime(landlord.getMinRentTime());
             landlordInfo.setRent(landlord.getRent());
             return landlordInfo;

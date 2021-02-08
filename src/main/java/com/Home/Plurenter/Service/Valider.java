@@ -14,6 +14,14 @@ public class Valider {
         if (user.getName().equals("")){
             return false;
         }
+        if (user.getLocation().getCountry().equals("") ||
+            user.getLocation().getState().equals("") ||
+            user.getLocation().getCity().equals("") ||
+            user.getLocation().getCity_id()<0 ||
+            user.getLocation().getCountry_id()<0 ||
+            user.getLocation().getState_id()<0){
+            return false;
+        }
         return true;
     }
     public boolean ValidTenantDatas(Tenant tenant){

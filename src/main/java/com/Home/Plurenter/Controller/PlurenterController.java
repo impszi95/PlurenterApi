@@ -1,5 +1,7 @@
 package com.Home.Plurenter.Controller;
 
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchResponse;
+import com.Home.Plurenter.Security.Payload.Response.Match.MatchThumbnail;
 import com.Home.Plurenter.Security.Payload.Response.Meet.MeetResponse;
 import com.Home.Plurenter.Service.NotificationService;
 import com.Home.Plurenter.Service.PlurenterService;
@@ -44,7 +46,7 @@ public class PlurenterController {
     @GetMapping("/getAllMatches")
     public ResponseEntity<?> getAllMatches(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        List<MeetResponse> matchesMeets = plurenterService.GetAllMatchedMeets();
+        List<MatchThumbnail> matchesMeets = plurenterService.GetAllMatchedMeets();
         return ResponseEntity.ok(matchesMeets);
     }
 }

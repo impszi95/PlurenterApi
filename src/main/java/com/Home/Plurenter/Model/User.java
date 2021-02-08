@@ -20,6 +20,7 @@ public class User {
     private boolean isTenant;
     @Size(max = 500)
     private String description;
+    private String phone;
     private HashSet<String> previousMeets;
     private HashSet<String> matchedMeets;
     private HashSet<String> likedMeets;
@@ -30,12 +31,14 @@ public class User {
     private List<Photo> photos;
     private boolean active;
     private boolean canActivate;
+    private Location location;
 
     public User(String name, String email, String password) {
         this.email = email;
         this.name = name;
         this.password = password;
         this.description = "";
+        this.phone = "";
         this.likes = 0;
         this.matches = 0;
         this.actualMeetId = "";
@@ -47,6 +50,7 @@ public class User {
         this.isTenant = true;
         this.active = false;
         this.canActivate = false;
+        this.location = new Location("","","",-1,-1,-1);
     }
 
     public boolean getIsTenant(){return this.isTenant;}
@@ -130,8 +134,12 @@ public class User {
     }
     public void setDescription(String description){this.description = description;}
     public String getDescription(){return this.description;}
+    public String getPhone(){return phone;}
+    public void setPhone(String phone){this.phone = phone;}
     public boolean getActive(){return this.active;}
     public void setActive(boolean active){this.active = active;}
     public boolean getCanActivate(){return this.canActivate;}
     public void setCanActivate(boolean canActivate){this.canActivate = canActivate;}
+    public Location getLocation(){return location;}
+    public void setLocation(Location location){this.location = location;}
 }
