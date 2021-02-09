@@ -19,8 +19,8 @@ public class NotificationService {
     }
 
     public void NewMatchNotification(Notification notification) {
-        //String url = "http://localhost:8082/ws";
-        String url = "http://websocket-notifier:8082/ws";
+        String url = "http://localhost:8082/ws";
+        //String url = "http://websocket-notifier:8082/ws";
 
         HttpEntity<Notification> request = new HttpEntity<Notification>(notification);
 
