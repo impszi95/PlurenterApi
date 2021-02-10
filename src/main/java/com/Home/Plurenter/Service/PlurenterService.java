@@ -45,22 +45,18 @@ public class PlurenterService {
         else{
             repo_size = activeTenantRepo.findAll().size();
         }
-        //Without confitions //All visited
-//        if (repo_size == user.getPreviousMeets().size())
-//        {
-//            user.setActualMeetId("");
-//            userRepo.save(user);
-//            return;
-//        }
         String rndUserId = "";
         boolean foundMeet = false;
         if (!user.getIsTenant()) {
+            Landlord landlord = landlordRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
             for (int i=0;i<repo_size;i++){  //Try N random
                 rndUserId = activeTenantRepo.findAll().get(rand.nextInt(repo_size)).getId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
+                    //TODO User->abstract Tenant/Landlord extended
+                    User userProbMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: userId"));
                     Tenant probMeet = tenantRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
-                    boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
+                    boolean tenantFitsConditions = CheckConditionsForTenant(user, landlord, probMeet, userProbMeet);
                     if (tenantFitsConditions){
                         i=repo_size;
                         foundMeet = true;
@@ -73,7 +69,8 @@ public class PlurenterService {
                     boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                     if (haventMet){
                         Tenant probMeet = tenantRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
-                        boolean tenantFitsConditions = CheckConditionsForTenant(user, probMeet);
+                        User userProbMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: userId"));
+                        boolean tenantFitsConditions = CheckConditionsForTenant(user, landlord, probMeet, userProbMeet);
                         if (tenantFitsConditions){
                             i=repo_size;
                             foundMeet = true;
@@ -87,12 +84,14 @@ public class PlurenterService {
 //            } while (user.getPreviousMeets().contains(rndUserId));
         }
         else{
+            Tenant tenant = tenantRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Tenant Not Found with commonId"));
             for (int i=0;i<repo_size;i++){
                 rndUserId = activeLandlordRepo.findAll().get(rand.nextInt(repo_size)).getId();
                 boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                 if (haventMet){
+                    User userProbMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: userId"));
                     Landlord probMeet = landlordRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
-                    boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
+                    boolean landlordFitsConditions = CheckConditionsForLandlord(user, tenant, probMeet, userProbMeet);
                     if (landlordFitsConditions){
                         i=repo_size;
                         foundMeet = true;
@@ -104,8 +103,9 @@ public class PlurenterService {
                     rndUserId = activeLandlordRepo.findAll().get(i).getId();
                     boolean haventMet = !user.getPreviousMeets().contains(rndUserId);
                     if (haventMet){
+                        User userProbMeet = userRepo.findById(rndUserId) .orElseThrow(() -> new UsernameNotFoundException("User Not Found with userId: userId"));
                         Landlord probMeet = landlordRepo.findById(rndUserId).orElseThrow(() -> new UsernameNotFoundException("probMeet Not Found with userId" ));
-                        boolean landlordFitsConditions = CheckConditionsForLandlord(user, probMeet);
+                        boolean landlordFitsConditions = CheckConditionsForLandlord(user, tenant, probMeet, userProbMeet);
                         if (landlordFitsConditions){
                             i=repo_size;
                             foundMeet = true;
@@ -131,19 +131,19 @@ public class PlurenterService {
         userRepo.save(user);
         return true;
     }
-    private boolean CheckConditionsForLandlord(User user, Landlord probMeet) {
-        Tenant tenant = tenantRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
-        if (probMeet.getMinRentTime().isLessOrEqualsThan(tenant.getMinRentTime())){
-            return true;
+    private boolean CheckConditionsForLandlord(User user,Tenant tenant, Landlord probMeet, User userProbMeet) {
+        if (!probMeet.getMinRentTime().isLessOrEqualsThan(tenant.getMinRentTime())||
+            !userProbMeet.getLocation().equals(user.getLocation())){
+            return false;
         }
-        return false;
+        return true;
     }
-    private boolean CheckConditionsForTenant(User user, Tenant probMeet) {
-        Landlord landlord = landlordRepo.findById(user.getId()).orElseThrow(() -> new UsernameNotFoundException("Landlord Not Found with commonId"));
-        if (probMeet.getMinRentTime().isMoreOrEqualsThan(landlord.getMinRentTime())){
-            return true;
+    private boolean CheckConditionsForTenant(User user, Landlord landlord, Tenant probMeet, User userProbMeet) {
+        if (!probMeet.getMinRentTime().isMoreOrEqualsThan(landlord.getMinRentTime()) ||
+            !userProbMeet.getLocation().equals(user.getLocation())){
+            return false;
         }
-        return false;
+        return true;
     }
     public MeetResponse GetActualMeet(){
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
